@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title>Dashboard Médico - Portal de Especialidades</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --card-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --hover-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #1e293b 50%, #1e3a8a 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .glassmorphism {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .specialty-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .specialty-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--specialty-color, #4f46e5) 0%, var(--specialty-color-end, #7c3aed) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .specialty-card:hover::before {
+            opacity: 1;
+        }
+
+        .specialty-card:hover {
+            background: var(--hover-bg);
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+        }
+
+        .specialty-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .specialty-card:hover .specialty-icon {
+            transform: scale(1.1);
+        }
+
+        .stats-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .quick-action-btn {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.8) 0%, rgba(99, 102, 241, 0.8) 100%);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--card-border);
+            color: white;
+            font-weight: 600;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .welcome-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .specialty-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .recent-activity {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .activity-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+
+        /* Colores específicos por especialidad */
+        .cardio { --specialty-color: #ef4444; --specialty-color-end: #dc2626; }
+        .pneumo { --specialty-color: #3b82f6; --specialty-color-end: #2563eb; }
+        .gastro { --specialty-color: #10b981; --specialty-color-end: #059669; }
+        .endocrino { --specialty-color: #8b5cf6; --specialty-color-end: #7c3aed; }
+        .hemato { --specialty-color: #ef4444; --specialty-color-end: #dc2626; }
+        .neuro { --specialty-color: #ec4899; --specialty-color-end: #db2777; }
+        .oftalmo { --specialty-color: #06b6d4; --specialty-color-end: #0891b2; }
+        .otorrino { --specialty-color: #eab308; --specialty-color-end: #ca8a04; }
+        .reumato { --specialty-color: #f97316; --specialty-color-end: #ea580c; }
+        .dermato { --specialty-color: #ec4899; --specialty-color-end: #db2777; }
+        .traumato { --specialty-color: #10b981; --specialty-color-end: #059669; }
+        .urologia { --specialty-color: #6366f1; --specialty-color-end: #4f46e5; }
+        .psiquiatria { --specialty-color: #8b5cf6; --specialty-color-end: #7c3aed; }
+        .infectologia { --specialty-color: #ef4444; --specialty-color-end: #dc2626; }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen bg-gradient-to-br from-indigo-900 via-slate-900 to-blue-800">
+        <!-- Header del Dashboard -->
+        <div class="dashboard-header p-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-full border border-indigo-500/30">
+                            <i class="fas fa-hospital h-8 w-8 text-indigo-300"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-bold text-white">MedScap Dashboard</h1>
+                            <p class="text-white/70">Portal Integral de Especialidades Médicas</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold bg-green-500/20 text-green-200 border border-green-500/30">
+                            <i class="fas fa-circle w-2 h-2 mr-2"></i>
+                            Sistema Activo
+                        </div>
+                        <button class="quick-action-btn">
+                            <i class="fas fa-plus w-4 h-4"></i>
+                            Nuevo Paciente
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Especialidades Médicas -->
+                <div class="lg:col-span-2">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-white">Especialidades Médicas</h2>
+                        <div class="flex gap-2">
+                            <button class="px-3 py-1 rounded-lg text-xs bg-blue-500/30 text-blue-200 border border-blue-400/30">Todas</button>
+                            <button class="px-3 py-1 rounded-lg text-xs bg-white/10 text-white/60 border border-white/20 hover:bg-white/20">Críticas</button>
+                            <button class="px-3 py-1 rounded-lg text-xs bg-purple-500/30 text-purple-200 border border-purple-400/30">Favoritas</button>
+                        </div>
+                    </div>
+
+                    <div class="specialty-grid">
+                        <!-- Cardiología -->
+                        <a href="cardiologia_algoritmo_completo1.html" class="specialty-card cardio">
+                            <div class="specialty-icon bg-red-500/20 border border-red-500/30">
+                                <i class="fas fa-heartbeat text-red-300 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Cardiología</h3>
+                            <p class="text-sm text-white/70 mb-4">Sistema cardiovascular, presión arterial, arritmias</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-red-200 bg-red-500/20 px-2 py-1 rounded-full">Alta prioridad</span>
+                                <i class="fas fa-arrow-right text-white/50"></i>
+                            </div>
+                        </a>
+
+                        <!-- Neumología -->
+                        <a href="pneumology_exam.html" class="specialty-card pneumo">
+                            <div class="specialty-icon bg-blue-500/20 border border-blue-500/30">
+                                <i class="fas fa-lungs text-blue-300 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Neumología</h3>
+                            <p class="text-sm text-white/70 mb-4">Sistema respiratorio, disnea, saturación</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-blue-200 bg-blue-500/20 px-2 py-1 rounded-full">Esencial</span>
+                                <i class="fas fa-arrow-right text-white/50"></i>
+                            </div>
+                        </a>
+
+                        <!-- Gastroenterología -->
+                        <a href="gastro.html" class="specialty-card gastro">
+                            <div class="specialty-icon bg-green-500/20 border border-green-500/30">
+                                <i class="fas fa-stomach text-green-300 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Gastroenterología</h3>
+                            <p class="text-sm text-white/70 mb-4">Sistema digestivo, dolor abdominal, EVA</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-green-200 bg-green-500/20 px-2 py-1 rounded-full">Común</span>
+                                <i class="fas fa-arrow-right text-white/50"></i>
+                            </div>
+                        </a>
+
+                        <!-- Endocrinología -->
+                        <a href="endocrinology_exam.html" class="specialty-card endocrino">
+                            <div class="specialty-icon bg-purple-500/20 border border-purple-500/30">
+                                <i class="fas fa-dna text-purple-300 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Endocrinología</h3>
+                            <p class="text-sm text-white/70 mb-4">Diabetes, tiroides, hormonas</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-purple-200 bg-purple-500/20 px-2 py-1 rounded-full">Especializada</span>
+                                <i class="fas fa-arrow-right text-white/50"></i>
+                            </div>
+                        </a>
+
+                        <!-- Hematología -->
+                        <a href="hematology_exam.html" class="specialty-card hemato">
+                            <div class="specialty-icon bg-red-500/20 border border-red-500/30">
+                                <i class="fas fa-tint text-red-300 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Hematología</h3>
+                            <p class="text-sm text-white/70 mb-4">Hemograma, anemia, coagulación</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-red-200 bg-red-500/20 px-2 py-1 rounded-full">Laboratorio</span>
+                                <i class="fas fa-arrow-right text-white/50"></i>
+                            </div>
+                        </a>
+
+                        <!-- Neurología -->
+                        <a href="neurology_exam.html" class="specialty-card neuro">
+                            <div class="specialty-icon bg-pink-500/20 border border-pink-500/30">
+                                <i class="fas fa-brain text-pink-300 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Neurología</h3>
+                            <p class="text-sm text-white/70 mb-4">Glasgow, función motora, coordinación</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-pink-200 bg-pink-500/20 px-2 py-1 rounded-full">Crítica</span>
+                                <i class="fas fa-arrow-right text-white/50"></i>
+                            </div>
+                        </a>
+
+                        <!-- Oftalmología -->
+                        <a href="Oftalmo.html" class="specialty-card oftalmo">
+                            <div class="specialty-icon bg-cyan-500/20 border border-cyan-500/30">
+                                <i class="fas fa-eye text-cyan-300 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Oftalmología</h3>
+                            <p class="text-sm text-white/70 mb-4">Agudeza visual, presión intraocular</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-cyan-200 bg-cyan-500/20 px-2 py-1 rounded-full">Sensorial</span>
+                                <i class="fas fa-arrow-right text-white/50"></i>
+                            </div>
+                        </a>
+
+                        <!-- Otorrinolaringología -->
+                        <a href="otolaryngology_exam_es.html" class="specialty-card otorrino">
+                            <div class="specialty-icon bg-yellow-500/20 border border-yellow-500/30">
+                                <i class="fas fa-ear-listen text-yellow-300 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Otorrinolaringología</h3>
+                            <p class="text-sm text-white/70 mb-4">Oído, nariz, garganta, audición</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-yellow-200 bg-yellow-500/20 px-2 py-1 rounded-full">Sensorial</span>
+                                <i class="fas fa-arrow-right text-white/50"></i>
+                            </div>
+                        </a>
+
+                        <!-- Reumatología -->
+                        <a href="rheumatology_exam.html" class="specialty-card reumato">
+                            <div class="specialty-icon bg-orange-500/20 border border-orange-500/30">
+                                <i class="fas fa-bone text-orange-300 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Reumatología</h3>
+                            <p class="text-sm text-white/70 mb-4">Artritis, marcadores inflamatorios</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-orange-200 bg-orange-500/20 px-2 py-1 rounded-full">Articular</span>
+                                <i class="fas fa-arrow-right text-white/50"></i>
+                            </div>
+                        </a>
+
+                        <!-- Dermatología -->
+                        <a href="derma.html" class="specialty-card dermato">
+                            <div class="specialty-icon bg-pink-500/20 border border-pink-500/30">
+                                <i class="fas fa-hand-paper text-pink-300 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Dermatología</h3>
+                            <p class="text-sm text-white/70 mb-4">Lesiones cutáneas, signos de alarma</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-pink-200 bg-pink-500/20 px-2 py-1 rounded-full">Visual</span>
+                                <i class="fas fa-arrow-right text-white/50"></i>
+                            </div>
+                        </a>
+
+                        <!-- Traumatología -->
+                        <a href="trama.html" class="specialty-card traumato">
+                            <div class="specialty-icon bg-green-500/20 border border-green-500/30">
+                                <i class="fas fa-running text-green-300 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Traumatología</h3>
+                            <p class="text-sm text-white/70 mb-4">Dolor musculoesquelético, movilidad</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-green-200 bg-green-500/20 px-2 py-1 rounded-full">Locomotor</span>
+                                <i class="fas fa-arrow-right text-white/50"></i>
+                            </div>
+                        </a>
+
+                        <!-- Urología -->
+                        <a href="urology_exam.html" class="specialty-card urologia">
+                            <div class="specialty-icon bg-indigo-500/20 border border-indigo-500/30">
+                                <i class="fas fa-kidneys text-indigo-300 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Urología</h3>
+                            <p class="text-sm text-white/70 mb-4">Tracto urinario, síntomas obstructivos</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-indigo-200 bg-indigo-500/20 px-2 py-1 rounded-full">Genitourinario</span>
+                                <i class="fas fa-arrow-right text-white/50"></i>
+                            </div>
+                        </a>
+
+                        <!-- Psiquiatría -->
+                        <a href="psychiatric_exam_system.html" class="specialty-card psiquiatria">
+                            <div class="specialty-icon bg-violet-500/20 border border-violet-500/30">
+                                <i class="fas fa-head-side-virus text-violet-300 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Psiquiatría</h3>
+                            <p class="text-sm text-white/70 mb-4">Estado mental, PHQ-9, GAD-7</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-violet-200 bg-violet-500/20 px-2 py-1 rounded-full">Mental</span>
+                                <i class="fas fa-arrow-right text-white/50"></i>
+                            </div>
+                        </a>
+
+                        <!-- Infectología -->
+                        <a href="infectious_diseases_exam.html" class="specialty-card infectologia">
+                            <div class="specialty-icon bg-red-500/20 border border-red-500/30">
+                                <i class="fas fa-virus text-red-300 text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Infectología</h3>
+                            <p class="text-sm text-white/70 mb-4">Síndrome febril, marcadores inflamatorios</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-red-200 bg-red-500/20 px-2 py-1 rounded-full">Urgente</span>
+                                <i class="fas fa-arrow-right text-white/50"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Panel lateral -->
+                <div class="space-y-6">
+                    <!-- Acciones rápidas -->
+                    <div class="glassmorphism rounded-2xl p-6">
+                        <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                            <i class="fas fa-bolt text-yellow-400"></i>
+                            Acciones Rápidas
+                        </h3>
+                        <div class="space-y-3">
+                            <button class="w-full text-left p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/20">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-user-plus text-blue-400"></i>
+                                    <div>
+                                        <div class="text-sm font-medium text-white">Nuevo Paciente</div>
+                                        <div class="text-xs text-white/60">Registrar paciente</div>
+                                    </div>
+                                </div>
+                            </button>
+                            <button class="w-full text-left p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/20">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-search text-green-400"></i>
+                                    <div>
+                                        <div class="text-sm font-medium text-white">Buscar Historial</div>
+                                        <div class="text-xs text-white/60">Consultar registros</div>
+                                    </div>
+                                </div>
+                            </button>
+                            <button class="w-full text-left p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/20">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-chart-line text-purple-400"></i>
+                                    <div>
+                                        <div class="text-sm font-medium text-white">Estadísticas</div>
+                                        <div class="text-xs text-white/60">Ver métricas</div>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Actividad reciente -->
+                    <div class="recent-activity">
+                        <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                            <i class="fas fa-clock text-blue-400"></i>
+                            Actividad Reciente
+                        </h3>
+                        <div class="space-y-2">
+                            <div class="activity-item">
+                                <div class="activity-icon bg-blue-500/20 text-blue-300">
+                                    <i class="fas fa-heartbeat"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="text-sm text-white">Sistema iniciado</div>
+                                    <div class="text-xs text-white/60">Hace 2 minutos</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon bg-green-500/20 text-green-300">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="text-sm text-white">Todas las especialidades cargadas</div>
+                                    <div class="text-xs text-white/60">Hace 2 minutos</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon bg-purple-500/20 text-purple-300">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="text-sm text-white">Base de datos conectada</div>
+                                    <div class="text-xs text-white/60">Hace 3 minutos</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animaciones de entrada
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.specialty-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // Funcionalidad de búsqueda en tiempo real
+        function setupSearch() {
+            const searchInput = document.querySelector('input[placeholder*="Buscar"]');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const query = e.target.value.toLowerCase();
+                    const cards = document.querySelectorAll('.specialty-card');
+                    
+                    cards.forEach(card => {
+                        const title = card.querySelector('h3').textContent.toLowerCase();
+                        const description = card.querySelector('p').textContent.toLowerCase();
+                        const isVisible = title.includes(query) || description.includes(query);
+                        
+                        card.style.display = isVisible ? 'block' : 'none';
+                        
+                        if (isVisible) {
+                            card.style.animation = 'fadeIn 0.3s ease';
+                        }
+                    });
+                });
+            }
+        }
+
+        // Efectos de hover mejorados
+        document.querySelectorAll('.specialty-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Funcionalidad de filtros
+        document.querySelectorAll('button[data-filter], .lg\\:col-span-2 button').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remover clase active de botones hermanos
+                const siblings = this.parentElement.querySelectorAll('button');
+                siblings.forEach(btn => {
+                    btn.classList.remove('bg-blue-500/30', 'text-blue-200', 'border-blue-400/30');
+                    btn.classList.add('bg-white/10', 'text-white/60', 'border-white/20');
+                });
+                
+                // Agregar clase active al botón actual
+                this.classList.remove('bg-white/10', 'text-white/60', 'border-white/20');
+                this.classList.add('bg-blue-500/30', 'text-blue-200', 'border-blue-400/30');
+                
+                // Aplicar filtro (lógica personalizable)
+                const filterText = this.textContent.toLowerCase();
+                console.log('Filtro aplicado:', filterText);
+            });
+        });
+
+        // Actualizar estadísticas en tiempo real
+        function updateDashboardStats() {
+            const specialtyCount = document.querySelectorAll('.specialty-card').length;
+            const activeExams = 0; // Se actualizará dinámicamente
+            const criticalAlerts = 0; // Se actualizará dinámicamente
+            
+            // Actualizar contadores si existen
+            const statsCards = document.querySelectorAll('.stats-card .text-3xl');
+            if (statsCards.length >= 4) {
+                statsCards[0].textContent = specialtyCount;
+                statsCards[1].textContent = activeExams;
+                statsCards[2].textContent = criticalAlerts;
+            }
+        }
+
+        // Inicializar funcionalidades
+        setupSearch();
+        updateDashboardStats();
+
+        // Animación CSS para fadeIn
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

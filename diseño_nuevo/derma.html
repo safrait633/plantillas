@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title>Examen Dermatológico - Portal Médico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --card-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --hover-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #1e293b 50%, #1e3a8a 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .glassmorphism {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .exam-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .section-header:hover {
+            background: var(--hover-bg);
+        }
+
+        .section-content {
+            padding: 1.5rem;
+            border-top: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .symptom-card {
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .symptom-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .symptom-card.selected {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgb(59, 130, 246);
+        }
+
+        .progress-bar {
+            width: 4rem;
+            height: 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .medical-input {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: white;
+            width: 100%;
+        }
+
+        .medical-input:focus {
+            outline: none;
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .medical-select {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: white;
+            width: 100%;
+        }
+
+        .medical-select:focus {
+            outline: none;
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.8) 0%, rgba(99, 102, 241, 0.8) 100%);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--card-border);
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .results-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Botón de volver -->
+    <div class="absolute top-4 left-4 z-10">
+        <a href="index.html" class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border hover:text-accent-foreground h-9 rounded-md px-3 bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-md">
+            <i class="fas fa-arrow-left w-4 h-4 mr-2"></i>
+            Volver
+        </a>
+    </div>
+
+    <div class="min-h-screen bg-gradient-to-br from-indigo-900 via-slate-900 to-blue-800">
+        <!-- Header -->
+        <div class="backdrop-blur-md bg-black/30 border-b border-white/10 p-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-pink-500/20 rounded-full border border-pink-500/30">
+                            <i class="fas fa-hand-paper h-8 w-8 text-pink-300"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-bold text-white">Dermatología Avanzada</h1>
+                            <p class="text-white/70">Framework Universal - Principio ZERO-TYPING</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 hover:bg-primary/80 bg-pink-500/20 text-pink-200 border border-pink-500/30">0% Completado</div>
+                        <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border hover:text-accent-foreground h-10 px-4 py-2 bg-white/10 border-white/20 text-white hover:bg-white/20">
+                            <i class="fas fa-file-text w-4 h-4 mr-2"></i>
+                            Ver Informe
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="flex gap-6 p-6">
+            <!-- Lista de secciones -->
+            <div class="transition-all duration-300 w-full max-w-4xl mx-auto">
+                <div class="space-y-4">
+                    <!-- Lesiones Cutáneas -->
+                    <div class="exam-section glassmorphism">
+                        <div class="section-header">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-search w-5 h-5 text-pink-500"></i>
+                                    <div>
+                                        <h3 class="font-semibold text-white">Lesiones Cutáneas</h3>
+                                        <p class="text-sm text-white/70">Inspección y características</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill"></div>
+                                        </div>
+                                        <span class="text-xs text-white/70">0%</span>
+                                    </div>
+                                    <i class="fas fa-chevron-down w-5 h-5 text-white/70"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section-content">
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="text-white font-semibold text-lg mb-3 flex items-center gap-2">
+                                        <i class="fas fa-eye w-4 h-4 text-blue-400"></i>
+                                        Tipo de Lesión
+                                    </label>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="radio" id="lesion-macula" name="tipo_lesion" value="macula" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="lesion-macula">Mácula</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="radio" id="lesion-papula" name="tipo_lesion" value="papula" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="lesion-papula">Pápula</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="radio" id="lesion-nodulo" name="tipo_lesion" value="nodulo" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="lesion-nodulo">Nódulo</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="radio" id="lesion-vesicula" name="tipo_lesion" value="vesicula" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="lesion-vesicula">Vesícula</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="radio" id="lesion-ampolla" name="tipo_lesion" value="ampolla" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="lesion-ampolla">Ampolla</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="radio" id="lesion-ulcera" name="tipo_lesion" value="ulcera" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="lesion-ulcera">Úlcera</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="border-t border-white/20 pt-6">
+                                    <label class="text-white font-semibold text-lg mb-3 flex items-center gap-2">
+                                        <i class="fas fa-palette w-4 h-4 text-purple-400"></i>
+                                        Características
+                                    </label>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label class="text-white text-sm mb-2 block">Color</label>
+                                            <select id="color-lesion" class="medical-select">
+                                                <option value="">Seleccionar</option>
+                                                <option value="eritematosa">Eritematosa</option>
+                                                <option value="hiperpigmentada">Hiperpigmentada</option>
+                                                <option value="hipopigmentada">Hipopigmentada</option>
+                                                <option value="violacea">Violácea</option>
+                                                <option value="amarillenta">Amarillenta</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="text-white text-sm mb-2 block">Tamaño (cm)</label>
+                                            <input type="number" id="tamano-lesion" min="0" max="50" step="0.1" class="medical-input" placeholder="Diámetro en cm">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="border-t border-white/20 pt-6">
+                                    <label class="text-white font-semibold text-lg mb-3 flex items-center gap-2">
+                                        <i class="fas fa-exclamation-triangle w-4 h-4 text-red-400"></i>
+                                        Signos de Alarma
+                                    </label>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="alarma-asimetria" name="signos_alarma" value="asimetria" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="alarma-asimetria">Asimetría</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="alarma-bordes" name="signos_alarma" value="bordes_irregulares" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="alarma-bordes">Bordes irregulares</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="alarma-color-variado" name="signos_alarma" value="color_variado" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="alarma-color-variado">Color variado</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="alarma-diametro" name="signos_alarma" value="diametro_mayor_6mm" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="alarma-diametro">Diámetro > 6mm</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="alarma-evolucion" name="signos_alarma" value="evolucion_rapida" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="alarma-evolucion">Evolución rápida</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="alarma-sangrado" name="signos_alarma" value="sangrado" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="alarma-sangrado">Sangrado</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Evaluación de Eczema -->
+                    <div class="exam-section glassmorphism">
+                        <div class="section-header">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-allergies w-5 h-5 text-orange-500"></i>
+                                    <div>
+                                        <h3 class="font-semibold text-white">Evaluación de Eczema</h3>
+                                        <p class="text-sm text-white/70">Dermatitis y reacciones alérgicas</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill"></div>
+                                        </div>
+                                        <span class="text-xs text-white/70">0%</span>
+                                    </div>
+                                    <i class="fas fa-chevron-down w-5 h-5 text-white/70"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section-content">
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="text-white font-semibold text-lg mb-3 flex items-center gap-2">
+                                        <i class="fas fa-hand-dots w-4 h-4 text-yellow-400"></i>
+                                        Síntomas de Eczema
+                                    </label>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="eczema-prurito" name="sintomas_eczema" value="prurito" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="eczema-prurito">Prurito intenso</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="eczema-eritema" name="sintomas_eczema" value="eritema" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="eczema-eritema">Eritema</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="eczema-descamacion" name="sintomas_eczema" value="descamacion" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="eczema-descamacion">Descamación</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="eczema-vesiculas" name="sintomas_eczema" value="vesiculas" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="eczema-vesiculas">Vesículas</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="eczema-liquenificacion" name="sintomas_eczema" value="liquenificacion" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="eczema-liquenificacion">Liquenificación</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="eczema-fisuras" name="sintomas_eczema" value="fisuras" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="eczema-fisuras">Fisuras</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="border-t border-white/20 pt-6">
+                                    <label class="text-white font-semibold text-lg mb-3 flex items-center gap-2">
+                                        <i class="fas fa-map-marker-alt w-4 h-4 text-green-400"></i>
+                                        Localización
+                                    </label>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="loc-cara" name="localizacion" value="cara" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="loc-cara">Cara</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="loc-cuello" name="localizacion" value="cuello" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="loc-cuello">Cuello</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="loc-brazos" name="localizacion" value="brazos" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="loc-brazos">Brazos</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="loc-torso" name="localizacion" value="torso" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="loc-torso">Torso</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="loc-piernas" name="localizacion" value="piernas" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="loc-piernas">Piernas</label>
+                                        </div>
+                                        <div class="symptom-card flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5">
+                                            <input type="checkbox" id="loc-pliegues" name="localizacion" value="pliegues" class="h-4 w-4 rounded border-white/20 bg-white/10">
+                                            <label class="text-white text-sm cursor-pointer" for="loc-pliegues">Pliegues</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="w-80 space-y-4">
+                <!-- Búsqueda y filtros -->
+                <div class="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl">
+                    <div class="p-4">
+                        <div class="space-y-3">
+                            <div class="relative">
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-200 w-4 h-4"></i>
+                                <input type="text" class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl pl-10 pr-4 py-2 text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 w-full" placeholder="Buscar lesiones..." id="global-search">
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="filter-button active px-3 py-1 rounded-lg text-xs transition-colors bg-blue-500/30 text-blue-200 border border-blue-400/30" data-filter="all">Todos</button>
+                                <button class="filter-button px-3 py-1 rounded-lg text-xs transition-colors bg-white/10 text-white/60 border border-white/20 hover:bg-white/20" data-filter="critical">Críticas</button>
+                                <button class="filter-button px-3 py-1 rounded-lg text-xs transition-colors bg-purple-500/30 text-purple-200 border border-purple-400/30 hover:bg-purple-500/40" data-filter="specialties">
+                                    <i class="fas fa-th w-3 h-3 mr-1"></i>
+                                    Especialidades
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alertas activas -->
+                <div class="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl">
+                    <div class="p-6 pb-3">
+                        <div class="font-semibold text-white text-sm flex items-center gap-2">
+                            <i class="fas fa-triangle-exclamation h-4 w-4 text-red-400"></i>
+                            Alertas Activas
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0 space-y-3" id="alerts-container">
+                        <div class="relative w-full border p-4 rounded-xl backdrop-blur-sm border-orange-400/50 bg-orange-500/20">
+                            <div class="text-xs text-orange-200">⚠️ 0 lesiones evaluadas</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progreso del examen -->
+                <div class="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl">
+                    <div class="p-6 pb-3">
+                        <div class="font-semibold text-white text-sm flex items-center gap-2">
+                            <i class="fas fa-chart-line h-4 w-4 text-blue-400"></i>
+                            Progreso del Examen
+                            <div class="ml-auto">
+                                <div class="inline-flex items-center rounded-full px-2.5 py-0.5 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 hover:bg-primary/80 bg-blue-500/30 text-blue-200 border border-blue-400/30 text-xs">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-blue-200 text-xs">Completado</span>
+                                <span class="text-white text-sm font-bold">0%</span>
+                            </div>
+                            <div class="relative w-full overflow-hidden h-3 bg-white/20 rounded-xl">
+                                <div class="h-full w-full flex-1 bg-gradient-to-r from-pink-400 to-rose-500 transition-all" style="transform: translateX(-100%);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón finalizar -->
+                <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary hover:bg-primary/90 h-11 px-8 w-full bg-gradient-to-r from-pink-500/80 to-rose-600/80 hover:from-pink-600/90 hover:to-rose-700/90 backdrop-blur-xl border border-white/20 text-white font-bold py-4 shadow-2xl transform transition-all duration-300 hover:scale-105 rounded-2xl">
+                    <i class="fas fa-circle-check h-5 w-5 mr-2"></i>
+                    Finalizar Dermatología
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="medical-unified.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Funcionalidad de expansión de secciones
+            const sectionHeaders = document.querySelectorAll('.section-header');
+            
+            sectionHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    const section = this.closest('.exam-section');
+                    const content = section.querySelector('.section-content');
+                    const chevron = this.querySelector('.fa-chevron-down, .fa-chevron-up');
+                    
+                    if (content.style.display === 'none' || !content.style.display) {
+                        content.style.display = 'block';
+                        if (chevron) chevron.classList.replace('fa-chevron-down', 'fa-chevron-up');
+                    } else {
+                        content.style.display = 'none';
+                        if (chevron) chevron.classList.replace('fa-chevron-up', 'fa-chevron-down');
+                    }
+                });
+            });
+
+            // Expandir primera sección por defecto
+            const firstSection = document.querySelector('.exam-section .section-content');
+            if (firstSection) {
+                firstSection.style.display = 'block';
+                const firstChevron = document.querySelector('.exam-section .fa-chevron-down');
+                if (firstChevron) firstChevron.classList.replace('fa-chevron-down', 'fa-chevron-up');
+            }
+
+            // Alertas para signos de alarma
+            const signosAlarma = document.querySelectorAll('input[name="signos_alarma"]');
+            signosAlarma.forEach(input => {
+                input.addEventListener('change', function() {
+                    if (this.checked && window.medicalInterface) {
+                        window.medicalInterface.showAlert('signo-alarma', 'error', `Signo de alarma detectado: ${this.nextElementSibling.textContent}`);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
