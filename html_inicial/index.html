@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Exámenes Médicos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Variables CSS para una paleta de colores consistente */
+        :root {
+            --primary-color: #667eea; /* Azul violeta */
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-color: #28a745; /* Verde */
+            --secondary-gradient: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            --text-color: #2c3e50;
+            --light-bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --hover-shadow-color: rgba(0, 0, 0, 0.15);
+        }
+
+        /* Estilos para el modo oscuro */
+        [data-theme="dark"] {
+            --primary-color: #764ba2;
+            --primary-gradient: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            --secondary-color: #20c997;
+            --secondary-gradient: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+            --text-color: #e0e0e0;
+            --light-bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --shadow-color: rgba(255, 255, 255, 0.05);
+            --hover-shadow-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            padding: 40px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .exam-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--shadow-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            text-decoration: none;
+            color: var(--text-color);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .exam-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px var(--hover-shadow-color);
+        }
+
+        .exam-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .exam-card:hover .exam-icon {
+            transform: scale(1.1);
+        }
+
+        .exam-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .exam-description {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 15px;
+        }
+
+        [data-theme="dark"] .exam-description {
+            color: #a0a0a0;
+        }
+
+        .view-button {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .view-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px var(--hover-shadow-color);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            .exam-card {
+                padding: 15px;
+            }
+            .theme-toggle {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
+        <i class="fas fa-moon" id="theme-icon"></i>
+    </button>
+
+    <div class="container">
+        <h1>Portal de Exámenes Médicos</h1>
+        <p class="text-center text-lg mb-8 text-gray-600">Selecciona el examen que deseas realizar:</p>
+
+        <div class="grid-container">
+            <a href="cardiologia_algoritmo_completo.html" class="exam-card">
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/7301072234176338993_0" alt="Examen Cardiovascular" class="exam-icon">
+                <h2 class="exam-title">Examen Cardiovascular</h2>
+                <p class="exam-description">Evaluación completa del sistema cardiovascular, incluyendo anamnesis, signos vitales, examen físico y escalas de riesgo.</p>
+                <div class="view-button">
+                    <i class="fas fa-arrow-right"></i> Ver Examen
+                </div>
+            </a>
+
+            <a href="pneumology_exam.html" class="exam-card">
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/6100402907876610809_0" alt="Examen Neumológico" class="exam-icon">
+                <h2 class="exam-title">Examen Neumológico</h2>
+                <p class="exam-description">Algoritmo de evaluación para el sistema respiratorio, incluyendo quejas, inspección, palpación, percusión, auscultación y escalas.</p>
+                <div class="view-button">
+                    <i class="fas fa-arrow-right"></i> Ver Examen
+                </div>
+            </a>
+
+            <a href="gastro.html" class="exam-card">
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/15753294376681453565_0" alt="Examen Gastroenterológico" class="exam-icon">
+                <h2 class="exam-title">Examen Gastroenterológico</h2>
+                <p class="exam-description">Evaluación del sistema digestivo, desde el estómago hasta el abdomen, con escalas de severidad y calidad de vida.</p>
+                <div class="view-button">
+                    <i class="fas fa-arrow-right"></i> Ver Examen
+                </div>
+            </a>
+
+            <a href="endocrinology_exam.html" class="exam-card">
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/11871888138200310172_0" alt="Examen Endocrinológico" class="exam-icon">
+                <h2 class="exam-title">Examen Endocrinológico</h2>
+                <p class="exam-description">Algoritmo para evaluar el sistema endocrino, incluyendo tiroides, metabolismo, antropometría y salud reproductiva.</p>
+                <div class="view-button">
+                    <i class="fas fa-arrow-right"></i> Ver Examen
+                </div>
+            </a>
+
+            <a href="hematology_exam.html" class="exam-card">
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/4020352149742575187_0" alt="Examen Hematológico" class="exam-icon">
+                <h2 class="exam-title">Examen Hematológico</h2>
+                <p class="exam-description">Evaluación del sistema hematológico, incluyendo quejas de sangrado/anemia, examen físico y escalas de riesgo.</p>
+                <div class="view-button">
+                    <i class="fas fa-arrow-right"></i> Ver Examen
+                </div>
+            </a>
+
+            <a href="neurology_exam.html" class="exam-card">
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/5422045716107733726_0" alt="Examen Neurológico" class="exam-icon">
+                <h2 class="exam-title">Examen Neurológico</h2>
+                <p class="exam-description">Evaluación completa del sistema nervioso, incluyendo estado mental, pares craneales, sistema motor, sensitivo y escalas.</p>
+                <div class="view-button">
+                    <i class="fas fa-arrow-right"></i> Ver Examen
+                </div>
+            </a>
+
+            <a href="Oftalmo.html" class="exam-card">
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/9886623099581932787_0" alt="Examen Oftalmológico" class="exam-icon">
+                <h2 class="exam-title">Examen Oftalmológico</h2>
+                <p class="exam-description">Algoritmo para la evaluación ocular, desde la agudeza visual hasta la fundoscopía, incluyendo presión intraocular y escalas.</p>
+                <div class="view-button">
+                    <i class="fas fa-arrow-right"></i> Ver Examen
+                </div>
+            </a>
+
+            <a href="otolaryngology_exam_es.html" class="exam-card">
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/11692759726357126808_0" alt="Examen Otorrinolaringológico" class="exam-icon">
+                <h2 class="exam-title">Examen Otorrinolaringológico</h2>
+                <p class="exam-description">Evaluación de oído, nariz, garganta y cuello, incluyendo audiometría, rinoscopia, laringoscopia y pruebas vestibulares.</p>
+                <div class="view-button">
+                    <i class="fas fa-arrow-right"></i> Ver Examen
+                </div>
+            </a>
+
+            <a href="rheumatology_exam.html" class="exam-card">
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/5872555136186959897_0" alt="Examen Reumatológico" class="exam-icon">
+                <h2 class="exam-title">Examen Reumatológico</h2>
+                <p class="exam-description">Evaluación de articulaciones, músculos y columna, incluyendo dolor, rigidez, inflamación y escalas como DAS28 y HAQ.</p>
+                <div class="view-button">
+                    <i class="fas fa-arrow-right"></i> Ver Examen
+                </div>
+            </a>
+
+            <a href="derma.html" class="exam-card">
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/17835919795610200742_0" alt="Examen Dermatológico" class="exam-icon">
+                <h2 class="exam-title">Examen Dermatológico</h2>
+                <p class="exam-description">Evaluación de la piel, lesiones primarias y secundarias, distribución, anexos cutáneos y escalas de severidad (PASI, SCORAD, DLQI).</p>
+                <div class="view-button">
+                    <i class="fas fa-arrow-right"></i> Ver Examen
+                </div>
+            </a>
+
+            <a href="trama.html" class="exam-card">
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/2142512097269118019_0" alt="Examen Musculoesquelético" class="exam-icon">
+                <h2 class="exam-title">Examen Musculoesquelético</h2>
+                <p class="exam-description">Algoritmo completo para la evaluación musculoesquelética, incluyendo anamnesis estructurada, ROM, fuerza (MRC) y examen neurológico asociado.</p>
+                <div class="view-button">
+                    <i class="fas fa-arrow-right"></i> Ver Examen
+                </div>
+            </a>
+
+            <a href="urology_exam (1).html" class="exam-card">
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/1123135418574884671_0" alt="Examen Urológico" class="exam-icon">
+                <h2 class="exam-title">Examen Urológico</h2>
+                <p class="exam-description">Evaluación del sistema urológico, incluyendo quejas miccionales, examen genital (masculino/femenino), prostático y escalas (IPSS, ICIQ, IIEF).</p>
+                <div class="view-button">
+                    <i class="fas fa-arrow-right"></i> Ver Examen
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (body.hasAttribute('data-theme')) {
+                body.removeAttribute('data-theme');
+                themeIcon.className = 'fas fa-moon';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Cargar el tema guardado al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                document.getElementById('theme-icon').className = 'fas fa-sun';
+            }
+        });
+    </script>
+</body>
+</html>
