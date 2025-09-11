@@ -4,1035 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Examen Dermatológico - Algoritmo de Evaluación</title>
-    <link rel="stylesheet" href="./styles/main.css">
-    <link rel="stylesheet" href="./styles/dashboard.css">
-    <style>
-        /* Специфичные стили для дерматологического экзамена */
-        .main-container {
-            padding-top: 160px; /* Пространство для фиксированного дашборда */
-        }
-
-        .nav-item i {
-            width: 16px;
-            text-align: center;
-        }
-
-        /* 📊 PANEL LATERAL STICKY - FUNCIONALIDAD PRINCIPAL (Copiado y adaptado de gastro.html) */
-        .sticky-panel {
-            position: fixed;
-            top: 160px; /* Ajustado para debajo del dashboard */
-            right: -420px; /* Oculto por defecto */
-            width: 400px;
-            height: calc(100vh - 180px);
-            background: var(--card-bg);
-            border-radius: 12px 0 0 12px;
-            box-shadow: -4px 0 20px rgba(0,0,0,0.15);
-            z-index: 997;
-            transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            overflow: hidden;
-            border: 2px solid var(--primary-gradient);
-        }
-
-        .sticky-panel.active {
-            right: 0;
-        }
-
-        .sticky-header {
-            background: var(--primary-gradient);
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .sticky-controls {
-            display: flex;
-            gap: 8px;
-        }
-
-        .sticky-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            border-radius: 4px;
-            padding: 6px 10px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .sticky-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: scale(1.05);
-        }
-
-        .sticky-content {
-            padding: 20px;
-            height: calc(100% - 70px);
-            overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-            line-height: 1.4;
-            white-space: pre-wrap;
-            background: var(--light-bg);
-        }
-
-        .update-indicator {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--primary-gradient);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            display: none;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            z-index: 10;
-        }
-
-        .update-indicator.active {
-            display: flex;
-        }
-
-        .spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top: 2px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Notificación de copia (Copiado de gastro.html) */
-        .copy-notification {
-            position: fixed;
-            top: 200px;
-            right: 20px;
-            background: var(--normal-color);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 500;
-            opacity: 0;
-            transform: translateX(100px);
-            transition: all 0.3s ease;
-            z-index: 1002;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .copy-notification.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        /* Ajustar contenido principal cuando panel está activo (Copiado y adaptado de gastro.html) */
-        /* Aplicado al body para simplicidad, como en gastro.html */
-        body.split-view-active .main-container {
-            margin-right: 420px;
-            transition: margin-right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        body.split-view .main-container { /* Para el panel de navegación izquierdo */
-            margin-left: 290px;
-            margin-right: 20px; /* Asegura que no se solape con el sticky si ambos están abiertos */
-            transition: margin-left 0.3s ease, margin-right 0.3s ease;
-        }
-
-        /* Contenedor principal (Modificado para usar variables y mejores sombras) */
-        .main-container {
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 30px;
-            margin: 0 20px; /* Ajuste para espacio en los lados */
-            transition: all 0.3s ease;
-        }
-        
-        /* Título principal (Modificado para usar gradiente de texto) */
-        h1 {
-            color: var(--text-color-light); /* Fallback */
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 28px;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            padding-bottom: 15px; /* Reemplaza border-bottom con gradiente de texto */
-        }
-        
-        /* Стили секций уже определены в common.css */
-        
-        .section-header .arrow {
-            transition: transform 0.3s ease;
-            font-size: 18px;
-        }
-        
-        .section-header.expanded .arrow {
-            transform: rotate(180deg);
-        }
-
-        /* Badge de completado (Copiado de gastro.html) */
-        .section-header .completion-badge {
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-
-        .section-header .completion-badge.completed {
-            background: var(--normal-color);
-        }
-        
-        .section-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-in-out;
-            background: var(--light-bg); /* Fondo de la sección de contenido */
-        }
-        
-        .section-content.expanded {
-            padding: 20px;
-        }
-        
-        /* Contenedores de examen (Modificado para usar variables y sombras en hover) */
-        .exam-container {
-            background: var(--card-bg);
-            border: 1px solid #e1e8ed;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: all 0.3s ease; /* Transición para hover */
-        }
-        .exam-container:hover {
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* Sombra suave al pasar el ratón */
-        }
-        
-        .exam-header {
-            font-size: 18px;
-            font-weight: 600;
-            background: var(--primary-gradient); /* Usar gradiente para el encabezado del examen */
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: -20px -20px 15px -20px; /* Extender el fondo */
-            padding: 12px 20px;
-            border-radius: 8px 8px 0 0; /* Bordes redondeados en la parte superior */
-            border-bottom: none; /* Eliminar el borde inferior que tenías */
-        }
-        
-        .exam-section {
-            background: var(--light-bg);
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-        }
-        
-        .exam-section h4 {
-            color: var(--text-color-light); /* Color de texto principal */
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .sub-header {
-            color: var(--primary-gradient); /* Usar tu color primario para sub-headers */
-            margin: 15px 0 8px 0;
-            font-size: 13px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        /* Checkbox grid (Mejorado de gastro.html) */
-        .checkbox-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-        
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 8px; /* Más padding */
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-        .checkbox-item:hover {
-            background: rgba(230, 126, 34, 0.05); /* Color de hover sutil */
-        }
-        
-        .checkbox-item input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            margin: 0;
-            accent-color: var(--normal-color); /* Color del checkbox al marcar */
-        }
-        .checkbox-item input[type="radio"] {
-            width: 16px;
-            height: 16px;
-            margin: 0;
-            accent-color: var(--normal-color); /* Color del radio al marcar */
-        }
-        
-        .checkbox-item label {
-            font-size: 13px;
-            color: var(--text-color-light);
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-        .checkbox-item input:checked + label {
-            color: var(--normal-color);
-            font-weight: 500;
-        }
-        
-        .measurement {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 5px 0;
-        }
-        
-        .measurement label {
-            font-size: 12px;
-            color: #5d6d7e;
-            flex-basis: 120px;
-            flex-shrink: 0;
-        }
-        
-        .input-field {
-            width: 80px;
-            padding: 6px 10px; /* Más padding */
-            border: 2px solid #e9ecef; /* Borde más grueso y claro */
-            border-radius: 6px; /* Más redondeado */
-            font-size: 12px;
-            text-align: center;
-            transition: all 0.3s ease; /* Transición para el foco */
-        }
-        
-        .input-field:focus {
-            outline: none;
-            border-color: var(--primary-gradient); /* Color de borde al enfocar */
-            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1); /* Sombra suave al enfocar */
-        }
-
-        .body-map { /* Se mantiene pero la usaremos con interactive-body-map */
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-
-        .body-area { /* Se mantiene */
-            padding: 10px;
-            border: 1px solid #e1e8ed;
-            border-radius: 4px;
-            background: var(--card-bg);
-        }
-
-        .body-area h5 { /* Se mantiene */
-            margin: 0 0 8px 0;
-            font-size: 12px;
-            color: var(--text-color-light);
-            text-align: center;
-            font-weight: 600;
-        }
-
-        /* Secciones de evaluación de severidad (adaptadas para usar variables y transparencia) */
-        .severity-section {
-            background: rgba(255, 193, 7, 0.08); /* Fondo suave del color de advertencia */
-            border: 1px solid var(--warning-color);
-            border-radius: 8px; /* Más redondeado */
-            padding: 15px;
-            margin-top: 15px;
-        }
-
-        .severity-section h4 {
-            color: var(--warning-color);
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .severity-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 8px;
-        }
-
-        .severity-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 3px;
-        }
-
-        .severity-item input[type="radio"] {
-            width: 14px;
-            height: 14px;
-            accent-color: var(--normal-color); /* Color del radio al marcar */
-        }
-
-        .severity-item label {
-            font-size: 12px;
-            color: var(--text-color-light); /* Color de texto principal */
-            cursor: pointer;
-        }
-        
-        .test-results {
-            margin-top: 10px;
-        }
-        
-        .test-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            padding: 8px 12px; /* Más padding */
-            margin: 4px 0;
-            background: var(--card-bg);
-            border: 1px solid #e8ecef;
-            border-radius: 6px; /* Más redondeado */
-            transition: all 0.3s ease; /* Transición para hover */
-        }
-        .test-item:hover {
-            border-color: var(--primary-gradient); /* Borde con gradiente al pasar el ratón */
-            box-shadow: 0 2px 8px rgba(230, 126, 34, 0.1); /* Sombra suave al pasar el ratón */
-        }
-        
-        .test-item label {
-            font-size: 12px;
-            color: var(--text-color-light);
-            flex-grow: 1;
-            margin-right: 10px;
-        }
-        
-        .test-controls {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        
-        .test-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .test-checkbox input[type="checkbox"] {
-            width: 16px; /* Más grande */
-            height: 16px; /* Más grande */
-            accent-color: var(--normal-color);
-        }
-        
-        .test-checkbox span {
-            font-size: 12px; /* Más grande */
-            font-weight: 600; /* Más negrita */
-        }
-        
-        .positive { color: var(--alert-color) !important; }
-        .negative { color: var(--normal-color) !important; }
-        
-        .bilateral-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
-            margin-top: 10px;
-        }
-        
-        .side-container {
-            padding: 15px;
-            background: var(--card-bg);
-            border: 1px solid #e8ecef;
-            border-radius: 8px; /* Más redondeado */
-            transition: all 0.3s ease; /* Transición para hover */
-        }
-        .side-container:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        
-        .side-header {
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-color-light);
-            margin-bottom: 12px;
-            text-align: center;
-            border-bottom: 2px solid var(--primary-gradient); /* Borde con gradiente */
-            padding-bottom: 8px;
-        }
-        
-        .morphology-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 10px;
-        }
-        
-        .morphology-section {
-            padding: 15px;
-            background: var(--card-bg);
-            border: 1px solid #e8ecef;
-            border-radius: 8px; /* Más redondeado */
-            transition: all 0.3s ease;
-        }
-        .morphology-section:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        
-        .morphology-section h5 {
-            margin: 0 0 12px 0;
-            font-size: 14px;
-            color: var(--primary-gradient); /* Usar gradiente para el título */
-            text-align: center;
-            font-weight: 600;
-        }
-        
-        /* Conclusión (Mejorado de gastro.html) */
-        .conclusion {
-            margin-top: 30px;
-            padding: 25px; /* Más padding */
-            background: var(--card-bg);
-            border-radius: 12px; /* Más redondeado */
-            border: 2px solid #dee2e6;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .conclusion::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--primary-gradient);
-        }
-        
-        .conclusion h3 {
-            color: var(--text-color-light);
-            margin-bottom: 15px;
-        }
-        
-        .conclusion-text {
-            padding: 20px; /* Más padding */
-            background: var(--light-bg);
-            border-radius: 8px; /* Más redondeado */
-            border: 1px solid #dee2e6;
-            min-height: 200px;
-            font-family: 'Courier New', monospace;
-            white-space: pre-wrap;
-            font-size: 13px;
-            line-height: 1.5; /* Más espacio entre líneas */
-        }
-
-        /* Botones de control (Mejorado de gastro.html) */
-        .control-buttons {
-            margin-top: 25px;
-            display: flex;
-            gap: 12px; /* Más espacio */
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 12px 24px; /* Más padding */
-            border: none;
-            border-radius: 8px; /* Más redondeado */
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease; /* Transición general */
-            display: flex; /* Para íconos */
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px); /* Efecto de elevación */
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        /* Colores de botones usando gradientes y variables */
-        .btn-primary {
-            background: var(--primary-gradient);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.4); /* Sombra más fuerte para primario */
-        }
-
-        .btn-secondary {
-            background-color: var(--info-color); /* Usar color info */
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #138496; /* Color más oscuro al pasar el ratón */
-            box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3); /* Sombra para secundario */
-        }
-
-        /* TOGGLE DE TEMA (Copiado de gastro.html) */
-        .theme-toggle {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
-            cursor: pointer;
-            z-index: 1001;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Sombra */
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.1);
-        }
-
-        /* BOTÓN HOME (Copiado de gastro.html) */
-        /* Eliminado el original y se usará el copiado arriba */
-        .home-button { /* Se mantiene el estilo de gastro.html */
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--normal-color); /* Color verde para home */
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 1001;
-            transition: all 0.3s ease;
-        }
-        
-        .home-button:hover {
-            background-color: #229954;
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-        }
-
-
-        /* Leyendas (Modificado para usar variables) */
-        .legend {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 15px;
-            font-size: 12px;
-            flex-wrap: wrap;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-        }
-
-        .primary-color { background-color: var(--info-color); } /* Usar info-color para primaria */
-        .secondary-color { background-color: var(--warning-color); } /* Usar warning-color para secundaria */
-        .severity-color { background-color: var(--alert-color); } /* Usar alert-color para severidad */
-
-        .distribution-map {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .anatomy-region {
-            border: 1px solid #ddd;
-            border-radius: 8px; /* Más redondeado */
-            padding: 12px; /* Más padding */
-            background: var(--card-bg);
-            transition: all 0.3s ease;
-        }
-        .anatomy-region:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .anatomy-region h6 {
-            margin: 0 0 8px 0;
-            font-size: 13px; /* Más grande */
-            font-weight: 600;
-            color: var(--primary-gradient); /* Usar gradiente para el título */
-            text-align: center;
-            border-bottom: 1px solid var(--primary-gradient);
-            padding-bottom: 5px;
-        }
-
-        .description-area {
-            width: 100%;
-            min-height: 60px;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 12px;
-            resize: vertical;
-            background: var(--light-bg); /* Fondo acorde al tema */
-            color: var(--text-color-light);
-            transition: all 0.3s ease;
-        }
-        .description-area:focus {
-            outline: none;
-            border-color: var(--primary-gradient);
-            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
-        }
-
-        .score-calculation {
-            background: rgba(39, 174, 96, 0.08); /* Fondo suave del normal-color */
-            border: 1px solid var(--normal-color);
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-
-        .score-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 5px 0;
-            font-size: 13px;
-        }
-
-        .score-value {
-            font-weight: 600;
-            color: var(--normal-color);
-        }
-
-        /* ===== NUEVAS FUNCIONALIDADES AÑADIDAS ===== */
-        
-        /* Campo de texto expandible para especificaciones */
-        .specification-field {
-            width: 100%;
-            margin-top: 8px;
-            padding: 6px 10px;
-            border: 1px solid #d1d9e0;
-            border-radius: 4px;
-            font-size: 12px;
-            background: var(--light-bg);
-            color: var(--text-color-light);
-            transition: all 0.3s ease;
-            display: none;
-        }
-
-        .specification-field.show {
-            display: block;
-        }
-
-        .specification-field:focus {
-            outline: none;
-            border-color: var(--primary-gradient);
-            background: var(--card-bg);
-            box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.1);
-        }
-
-        /* Mapa corporal interactivo (Mejorado de tu original) */
-        .interactive-body-map {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin: 20px 0;
-            background: var(--card-bg);
-            border: 1px solid #e1e8ed;
-            border-radius: 8px;
-            padding: 20px;
-        }
-
-        .body-diagram {
-            position: relative;
-            background: var(--light-bg);
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .body-diagram h6 {
-            margin: 0 0 15px 0;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-color-light);
-        }
-
-        .body-svg {
-            width: 100%;
-            max-width: 300px;
-            height: auto;
-            cursor: crosshair;
-        }
-
-        .selected-areas {
-            margin-top: 15px;
-            font-size: 12px;
-            color: var(--text-color-light);
-        }
-
-        .selected-area-tag {
-            display: inline-block;
-            background: var(--primary-gradient);
-            color: white;
-            padding: 4px 8px;
-            margin: 2px;
-            border-radius: 12px;
-            font-size: 11px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .selected-area-tag:hover {
-            background: #d35400; /* Color más oscuro */
-            transform: translateY(-1px);
-        }
-
-        /* Regla ABCDE para melanoma (Mejorada con variables) */
-        .abcde-section {
-            background: rgba(255, 152, 0, 0.08); /* Fondo suave del color de advertencia */
-            border: 2px solid var(--warning-color);
-            border-radius: 8px;
-            padding: 20px;
-            margin: 15px 0;
-        }
-
-        .abcde-section h4 {
-            color: var(--warning-color);
-            margin: 0 0 15px 0;
-            font-size: 16px;
-            font-weight: 600;
-            text-align: center;
-            border-bottom: 2px solid var(--warning-color); /* Borde con color de advertencia */
-            padding-bottom: 8px;
-        }
-
-        .abcde-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .abcde-item {
-            background: var(--card-bg);
-            border: 1px solid #ffcc02; /* Color de borde de advertencia */
-            border-radius: 6px;
-            padding: 12px;
-            transition: all 0.3s ease;
-        }
-        .abcde-item:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transform: translateY(-2px);
-        }
-
-        .abcde-letter {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--warning-color);
-            margin-bottom: 8px;
-        }
-
-        .abcde-description {
-            font-size: 12px;
-            color: var(--text-color-light);
-            margin-bottom: 10px;
-        }
-
-        /* Vista dividida para conclusión (Se elimina el original para usar el sticky-panel) */
-        /* La vista dividida ahora se maneja con las clases en el body: split-view y split-view-active */
-        
-        /* Escalas adicionales (Mejoradas con variables) */
-        .scale-section {
-            background: rgba(70, 130, 180, 0.08); /* Fondo suave del info-color */
-            border: 1px solid var(--info-color);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-        }
-
-        .scale-section h4 {
-            color: var(--info-color);
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .dlqi-question {
-            background: var(--card-bg);
-            border: 1px solid #cbd5e0;
-            border-radius: 4px;
-            padding: 10px;
-            margin: 8px 0;
-        }
-
-        .dlqi-question label {
-            font-size: 12px;
-            color: var(--text-color-light);
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        .dlqi-options {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .dlqi-option {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .dlqi-option input[type="radio"] {
-            width: 14px;
-            height: 14px;
-            accent-color: var(--normal-color);
-        }
-
-        .dlqi-option label {
-            font-size: 11px !important;
-            margin: 0 !important;
-            cursor: pointer;
-            color: var(--text-color-light);
-        }
-
-        /* Responsive design mejorado (Copiado de gastro.html) */
-        @media (max-width: 1200px) {
-            /* Las reglas de split-view-container se eliminan porque se usan las del body */
-            .sticky-panel {
-                width: 350px;
-            }
-            body.split-view-active .main-container {
-                margin-right: 370px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            body { padding-top: 120px; } /* Ajuste para móviles */
-            
-            .control-bar {
-                position: relative;
-                top: auto;
-                right: auto;
-                justify-content: center;
-                margin: 10px 0;
-            }
-            
-            .nav-panel {
-                transform: translateX(-100%);
-                width: calc(100vw - 40px);
-            }
-            
-            .main-container {
-                margin: 0 10px;
-            }
-            
-            body.split-view .main-container {
-                margin-left: 10px;
-            }
-
-            .sticky-panel {
-                width: calc(100vw - 20px);
-                right: -100vw;
-                left: 10px;
-                border-radius: 12px;
-            }
-            
-            .sticky-panel.active {
-                right: auto;
-                left: 10px;
-            }
-            
-            body.split-view-active .main-container {
-                margin-right: 10px;
-            }
-            
-            .checkbox-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .interactive-body-map {
-                grid-template-columns: 1fr;
-            }
-            
-            .abcde-grid {
-                grid-template-columns: 1fr;
-            }
-            .morphology-grid {
-                grid-template-columns: 1fr;
-            }
-            .bilateral-container {
-                grid-template-columns: 1fr;
-            }
-            .distribution-map {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Indicadores de campos completados (Copiado de gastro.html, renombrado y reestilizado) */
-        .completion-badge { /* Nombre usado en gastro.html */
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-
-        .completion-badge.completed { /* Cambiado a .completed para mantener consistencia con gastro.html */
-            background: var(--normal-color);
-        }
-
-        /* Nuevas animaciones (Copiado de gastro.html) */
-        @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .slide-in {
-            animation: slideIn 0.3s ease forwards;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
 </head>
 <body>
     <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
@@ -1042,7 +15,7 @@
     <a href="index.html" class="home-button" title="Inicio">
         <i class="fas fa-home"></i>
     </a>
-    
+
     <div class="dashboard-fixed">
         <div class="dashboard-content">
             <div class="dashboard-grid">
@@ -1211,7 +184,7 @@
                         <input type="text" class="specification-field" id="spec-alimentos" placeholder="Especificar alimentos...">
                         <input type="text" class="specification-field" id="spec-contacto" placeholder="Especificar alérgenos...">
                     </div>
-                    
+
                     <div class="exam-section">
                         <h4>Historia de Atopia</h4>
                         <div class="checkbox-grid">
@@ -1261,7 +234,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="section" id="section-anamnesis">
             <div class="section-header" onclick="toggleSection(this)">
                 <span><i class="fas fa-question-circle"></i> Anamnesis y Quejas Principales</span>
@@ -1450,7 +423,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="section" id="section-primary-lesions">
             <div class="section-header" onclick="toggleSection(this)">
                 <span><i class="fas fa-viruses"></i> Elementos Primarios de las Lesiones Cutáneas</span>
@@ -1747,134 +720,134 @@
                                             .body-text { font-size: 7px; fill: var(--text-color-light); text-anchor: middle; pointer-events: none; }
                                         </style>
                                     </defs>
-                                    
+
                                     <circle class="body-part" data-area="Frente" cx="120" cy="25" r="18"/>
                                     <text class="body-text" x="120" y="28">Frente</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Ojo derecho" cx="110" cy="30" rx="6" ry="4"/>
                                     <text class="body-text" x="110" y="32">OD</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Ojo izquierdo" cx="130" cy="30" rx="6" ry="4"/>
                                     <text class="body-text" x="130" y="32">OI</text>
-                                    
+
                                     <polygon class="body-part" data-area="Nariz" points="120,35 115,45 125,45"/>
                                     <text class="body-text" x="120" y="42">Nariz</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Mejilla derecha" cx="105" cy="38" rx="8" ry="6"/>
                                     <text class="body-text" x="105" y="40">MD</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Mejilla izquierda" cx="135" cy="38" rx="8" ry="6"/>
                                     <text class="body-text" x="135" y="40">MI</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Labios" cx="120" cy="48" rx="8" ry="3"/>
                                     <text class="body-text" x="120" y="50">Labios</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Barbilla" cx="120" cy="55" rx="6" ry="4"/>
                                     <text class="body-text" x="120" y="57">Barbilla</text>
-                                    
+
                                     <rect class="body-part" data-area="Cuello anterior" x="110" y="60" width="20" height="15"/>
                                     <text class="body-text" x="120" y="70">Cuello</text>
-                                    
+
                                     <rect class="body-part" data-area="Pecho superior" x="85" y="75" width="70" height="25"/>
                                     <text class="body-text" x="120" y="90">Pecho superior</text>
-                                    
+
                                     <rect class="body-part" data-area="Pecho inferior" x="90" y="100" width="60" height="25"/>
                                     <text class="body-text" x="120" y="115">Pecho inferior</text>
-                                    
+
                                     <rect class="body-part" data-area="Hombro derecho" x="70" y="75" width="15" height="20"/>
                                     <text class="body-text" x="77" y="87">HD</text>
-                                    
+
                                     <rect class="body-part" data-area="Hombro izquierdo" x="155" y="75" width="15" height="20"/>
                                     <text class="body-text" x="162" y="87">HI</text>
-                                    
+
                                     <rect class="body-part" data-area="Brazo derecho superior" x="50" y="95" width="20" height="35"/>
                                     <text class="body-text" x="60" y="115">BDS</text>
-                                    
+
                                     <rect class="body-part" data-area="Brazo izquierdo superior" x="170" y="95" width="20" height="35"/>
                                     <text class="body-text" x="180" y="115">BIS</text>
-                                    
+
                                     <circle class="body-part" data-area="Codo derecho" cx="60" cy="140" r="8"/>
                                     <text class="body-text" x="60" y="143">CD</text>
-                                    
+
                                     <circle class="body-part" data-area="Codo izquierdo" cx="180" cy="140" r="8"/>
                                     <text class="body-text" x="180" y="143">CI</text>
-                                    
+
                                     <rect class="body-part" data-area="Antebrazo derecho" x="55" y="148" width="15" height="40"/>
                                     <text class="body-text" x="62" y="170">ABD</text>
-                                    
+
                                     <rect class="body-part" data-area="Antebrazo izquierdo" x="170" y="148" width="15" height="40"/>
                                     <text class="body-text" x="177" y="170">ABI</text>
-                                    
+
                                     <circle class="body-part" data-area="Muñeca derecha" cx="62" cy="195" r="6"/>
                                     <text class="body-text" x="62" y="198">MuD</text>
-                                    
+
                                     <circle class="body-part" data-area="Muñeca izquierda" cx="177" cy="195" r="6"/>
                                     <text class="body-text" x="177" y="198">MuI</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Mano derecha" cx="62" cy="210" rx="8" ry="12"/>
                                     <text class="body-text" x="62" y="213">MaD</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Mano izquierda" cx="177" cy="210" rx="8" ry="12"/>
                                     <text class="body-text" x="177" y="213">MaI</text>
-                                    
+
                                     <rect class="body-part" data-area="Abdomen superior" x="95" y="125" width="50" height="20"/>
                                     <text class="body-text" x="120" y="138">Abd Sup</text>
-                                    
+
                                     <rect class="body-part" data-area="Abdomen inferior" x="100" y="145" width="40" height="20"/>
                                     <text class="body-text" x="120" y="158">Abd Inf</text>
-                                    
+
                                     <rect class="body-part" data-area="Región inguinal derecha" x="100" y="165" width="15" height="15"/>
                                     <text class="body-text" x="107" y="175">RID</text>
-                                    
+
                                     <rect class="body-part" data-area="Región inguinal izquierda" x="125" y="165" width="15" height="15"/>
                                     <text class="body-text" x="132" y="175">RII</text>
-                                    
+
                                     <rect class="body-part" data-area="Genitales externos" x="110" y="180" width="20" height="15"/>
                                     <text class="body-text" x="120" y="190">Genit</text>
-                                    
+
                                     <rect class="body-part" data-area="Muslo derecho anterior" x="100" y="195" width="18" height="70"/>
                                     <text class="body-text" x="109" y="235">MDA</text>
-                                    
+
                                     <rect class="body-part" data-area="Muslo izquierdo anterior" x="122" y="195" width="18" height="70"/>
                                     <text class="body-text" x="131" y="235">MIA</text>
-                                    
+
                                     <circle class="body-part" data-area="Rodilla derecha anterior" cx="109" cy="275" r="10"/>
                                     <text class="body-text" x="109" y="278">RDA</text>
-                                    
+
                                     <circle class="body-part" data-area="Rodilla izquierda anterior" cx="131" cy="275" r="10"/>
                                     <text class="body-text" x="131" y="278">RIA</text>
-                                    
+
                                     <rect class="body-part" data-area="Pierna derecha anterior" x="104" y="285" width="15" height="70"/>
                                     <text class="body-text" x="111" y="325">PDA</text>
-                                    
+
                                     <rect class="body-part" data-area="Pierna izquierda anterior" x="126" y="285" width="15" height="70"/>
                                     <text class="body-text" x="133" y="325">PIA</text>
-                                    
+
                                     <circle class="body-part" data-area="Tobillo derecho anterior" cx="111" cy="365" r="8"/>
                                     <text class="body-text" x="111" y="368">TDA</text>
-                                    
+
                                     <circle class="body-part" data-area="Tobillo izquierdo anterior" cx="133" cy="365" r="8"/>
                                     <text class="body-text" x="133" y="368">TIA</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Pie derecho dorsal" cx="111" cy="385" rx="12" ry="20"/>
                                     <text class="body-text" x="111" y="388">PDD</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Pie izquierdo dorsal" cx="133" cy="385" rx="12" ry="20"/>
                                     <text class="body-text" x="133" y="388">PID</text>
-                                    
+
                                     <rect class="body-part" data-area="Dedos pie derecho" x="106" y="405" width="10" height="8"/>
                                     <text class="body-text" x="111" y="410">DPD</text>
-                                    
+
                                     <rect class="body-part" data-area="Dedos pie izquierdo" x="128" y="405" width="10" height="8"/>
                                     <text class="body-text" x="133" y="410">DPI</text>
                                 </svg>
-                                
+
                                 <div class="selected-areas">
                                     <strong>Áreas seleccionadas (Frontal):</strong>
                                     <div id="selected-areas-front"></div>
                                 </div>
                             </div>
-                            
+
                             <div class="body-diagram">
                                 <h6>Vista Posterior</h6>
                                 <svg class="body-svg" id="body-back-svg" viewBox="0 0 240 480">
@@ -1886,113 +859,113 @@
                                             .body-text { font-size: 7px; fill: var(--text-color-light); text-anchor: middle; pointer-events: none; }
                                         </style>
                                     </defs>
-                                    
+
                                     <circle class="body-part" data-area="Occipital" cx="120" cy="30" r="20"/>
                                     <text class="body-text" x="120" y="33">Occipital</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Región auricular derecha" cx="105" cy="35" rx="6" ry="8"/>
                                     <text class="body-text" x="105" y="38">OD</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Región auricular izquierda" cx="135" cy="35" rx="6" ry="8"/>
                                     <text class="body-text" x="135" y="38">OI</text>
-                                    
+
                                     <rect class="body-part" data-area="Nuca" x="110" y="50" width="20" height="20"/>
                                     <text class="body-text" x="120" y="63">Nuca</text>
-                                    
+
                                     <rect class="body-part" data-area="Espalda alta derecha" x="85" y="70" width="35" height="30"/>
                                     <text class="body-text" x="102" y="88">EAD</text>
-                                    
+
                                     <rect class="body-part" data-area="Espalda alta izquierda" x="120" y="70" width="35" height="30"/>
                                     <text class="body-text" x="137" y="88">EAI</text>
-                                    
+
                                     <rect class="body-part" data-area="Espalda media derecha" x="90" y="100" width="30" height="25"/>
                                     <text class="body-text" x="105" y="115">EMD</text>
-                                    
+
                                     <rect class="body-part" data-area="Espalda media izquierda" x="120" y="100" width="30" height="25"/>
                                     <text class="body-text" x="135" y="115">EMI</text>
-                                    
+
                                     <rect class="body-part" data-area="Región lumbar" x="100" y="125" width="40" height="25"/>
                                     <text class="body-text" x="120" y="140">Lumbar</text>
-                                    
+
                                     <rect class="body-part" data-area="Hombro derecho posterior" x="65" y="75" width="20" height="20"/>
                                     <text class="body-text" x="75" y="87">HDP</text>
-                                    
+
                                     <rect class="body-part" data-area="Hombro izquierdo posterior" x="155" y="75" width="20" height="20"/>
                                     <text class="body-text" x="165" y="87">HIP</text>
-                                    
+
                                     <rect class="body-part" data-area="Brazo derecho posterior superior" x="50" y="95" width="20" height="35"/>
                                     <text class="body-text" x="60" y="115">BDPS</text>
-                                    
+
                                     <rect class="body-part" data-area="Brazo izquierdo posterior superior" x="170" y="95" width="20" height="35"/>
                                     <text class="body-text" x="180" y="115">BIPS</text>
-                                    
+
                                     <circle class="body-part" data-area="Codo derecho posterior" cx="60" cy="140" r="8"/>
                                     <text class="body-text" x="60" y="143">CDP</text>
-                                    
+
                                     <circle class="body-part" data-area="Codo izquierdo posterior" cx="180" cy="140" r="8"/>
                                     <text class="body-text" x="180" y="143">CIP</text>
-                                    
+
                                     <rect class="body-part" data-area="Antebrazo derecho posterior" x="55" y="148" width="15" height="40"/>
                                     <text class="body-text" x="62" y="170">ABDP</text>
-                                    
+
                                     <rect class="body-part" data-area="Antebrazo izquierdo posterior" x="170" y="148" width="15" height="40"/>
                                     <text class="body-text" x="177" y="170">ABIP</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Mano derecha posterior" cx="62" cy="200" rx="8" ry="12"/>
                                     <text class="body-text" x="62" y="203">MaDP</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Mano izquierda posterior" cx="177" cy="200" rx="8" ry="12"/>
                                     <text class="body-text" x="177" y="203">MaIP</text>
-                                    
+
                                     <rect class="body-part" data-area="Región sacra" x="105" y="150" width="30" height="20"/>
                                     <text class="body-text" x="120" y="163">Sacra</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Glúteo derecho" cx="105" cy="185" rx="15" ry="20"/>
                                     <text class="body-text" x="105" y="188">GD</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Glúteo izquierdo" cx="135" cy="185" rx="15" ry="20"/>
                                     <text class="body-text" x="135" y="188">GI</text>
-                                    
+
                                     <rect class="body-part" data-area="Pliegue interglúteo" x="118" y="170" width="4" height="30"/>
                                     <text class="body-text" x="120" y="188">PIG</text>
-                                    
+
                                     <rect class="body-part" data-area="Muslo derecho posterior" x="100" y="205" width="18" height="70"/>
                                     <text class="body-text" x="109" y="245">MDP</text>
-                                    
+
                                     <rect class="body-part" data-area="Muslo izquierdo posterior" x="122" y="205" width="18" height="70"/>
                                     <text class="body-text" x="131" y="245">MIP</text>
-                                    
+
                                     <circle class="body-part" data-area="Hueco poplíteo derecho" cx="109" cy="285" r="10"/>
                                     <text class="body-text" x="109" y="288">HPD</text>
-                                    
+
                                     <circle class="body-part" data-area="Hueco poplíteo izquierdo" cx="131" cy="285" r="10"/>
                                     <text class="body-text" x="131" y="288">HPI</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Pantorrilla derecha" cx="109" cy="320" rx="12" ry="30"/>
                                     <text class="body-text" x="109" y="325">PaD</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Pantorrilla izquierda" cx="131" cy="320" rx="12" ry="30"/>
                                     <text class="body-text" x="131" y="325">PaI</text>
-                                    
+
                                     <rect class="body-part" data-area="Tendón Aquiles derecho" x="107" y="350" width="4" height="15"/>
                                     <text class="body-text" x="109" y="360">TAD</text>
-                                    
+
                                     <rect class="body-part" data-area="Tendón Aquiles izquierdo" x="129" y="350" width="4" height="15"/>
                                     <text class="body-text" x="131" y="360">TAI</text>
-                                    
+
                                     <circle class="body-part" data-area="Talón derecho" cx="109" cy="375" r="10"/>
                                     <text class="body-text" x="109" y="378">TD</text>
-                                    
+
                                     <circle class="body-part" data-area="Talón izquierdo" cx="131" cy="375" r="10"/>
                                     <text class="body-text" x="131" y="378">TI</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Planta pie derecho" cx="109" cy="395" rx="12" ry="18"/>
                                     <text class="body-text" x="109" y="398">PPD</text>
-                                    
+
                                     <ellipse class="body-part" data-area="Planta pie izquierdo" cx="131" cy="395" rx="12" ry="18"/>
                                     <text class="body-text" x="131" y="398">PPI</text>
                                 </svg>
-                                
+
                                 <div class="selected-areas">
                                     <strong>Áreas seleccionadas (Posterior):</strong>
                                     <div id="selected-areas-back"></div>
@@ -2018,7 +991,7 @@
                                     <div class="checkbox-item"><input type="checkbox" id="loc-retroauricular"><label for="loc-retroauricular">Región retroauricular</label></div>
                                 </div>
                             </div>
-                            
+
                             <div class="anatomy-region">
                                 <h6>Tronco</h6>
                                 <div class="checkbox-grid">
@@ -2030,7 +1003,7 @@
                                     <div class="checkbox-item"><input type="checkbox" id="loc-inguinal"><label for="loc-inguinal">Región inguinal</label></div>
                                 </div>
                             </div>
-                            
+
                             <div class="anatomy-region">
                                 <h6>Extremidades Superiores</h6>
                                 <div class="checkbox-grid">
@@ -2044,7 +1017,7 @@
                                     <div class="checkbox-item"><input type="checkbox" id="loc-espacios-interdigitales-manos"><label for="loc-espacios-interdigitales-manos">Espacios interdigitales</label></div>
                                 </div>
                             </div>
-                            
+
                             <div class="anatomy-region">
                                 <h6>Extremidades Inferiores</h6>
                                 <div class="checkbox-grid">
@@ -2059,7 +1032,7 @@
                                     <div class="checkbox-item"><input type="checkbox" id="loc-plantas"><label for="loc-plantas">Plantas</label></div>
                                 </div>
                             </div>
-                            
+
                             <div class="anatomy-region">
                                 <h6>Área Genital</h6>
                                 <div class="checkbox-grid">
@@ -2068,7 +1041,7 @@
                                     <div class="checkbox-item"><input type="checkbox" id="loc-perineal"><label for="loc-perineal">Región perineal</label></div>
                                 </div>
                             </div>
-                            
+
                             <div class="anatomy-region">
                                 <h6>Mucosas</h6>
                                 <div class="checkbox-grid">
@@ -2143,7 +1116,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="side-container">
                             <div class="side-header">Uñas</div>
                             <div class="exam-section">
@@ -2455,7 +1428,7 @@
                             <p style="font-size: 12px; color: var(--text-color-light); margin-bottom: 15px;">
                                 Cuestionario para evaluar el impacto de la condición dermatológica en la calidad de vida del paciente.
                             </p>
-                            
+
                             <div class="dlqi-question">
                                 <label>1. En la última semana, ¿cuánto le ha picado, dolido, escozido o molestado la piel?</label>
                                 <div class="dlqi-options">
@@ -2574,12 +1547,12 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="conclusion">
             <h3><i class="fas fa-file-medical-alt"></i> Conclusión del Examen Dermatológico</h3>
             <div class="conclusion-text" id="conclusion-text">Seleccione los parámetros del examen para generar la conclusión dermatológica...</div>
         </div>
-        
+
         <div class="control-buttons">
             <button class="btn btn-primary" onclick="generateConclusion()">
                 <i class="fas fa-file-medical"></i> Generar Conclusión
@@ -2615,7 +1588,7 @@
         function toggleTheme() {
             const body = document.body;
             const themeIcon = document.getElementById('theme-icon');
-            
+
             if (body.hasAttribute('data-theme')) {
                 body.removeAttribute('data-theme');
                 themeIcon.className = 'fas fa-moon';
@@ -2631,7 +1604,7 @@
         function toggleNavPanel() {
             const navPanel = document.getElementById('nav-panel');
             const body = document.body;
-            
+
             navPanel.classList.toggle('open');
             body.classList.toggle('split-view'); // Aplica al body para afectar el main-container
         }
@@ -2643,10 +1616,10 @@
             const stickyPanel = document.getElementById('stickyConclusion');
             const body = document.body; // Se aplica al body para afectar el main-container
             const btn = document.getElementById('sticky-toggle-btn');
-            
+
             stickyPanel.classList.toggle('active');
             body.classList.toggle('split-view-active'); // Aplica al body para afectar el main-container
-            
+
             if (stickyPanel.classList.contains('active')) {
                 btn.innerHTML = '<i class="fas fa-window-restore"></i> Vista Normal';
                 btn.classList.add('btn-warning');
@@ -2663,15 +1636,15 @@
         function generateStickyConclusion() {
             const stickyContent = document.getElementById('stickyContent');
             const updateIndicator = document.getElementById('updateIndicator');
-            
+
             updateIndicator.classList.add('active');
-            
+
             setTimeout(() => {
                 const originalConclusionEl = document.getElementById('conclusion-text');
                 const originalContent = originalConclusionEl.textContent;
-                
+
                 stickyContent.textContent = originalContent;
-                
+
                 updateIndicator.classList.remove('active');
             }, 300);
         }
@@ -2679,7 +1652,7 @@
         // Copiar contenido del panel sticky
         function copyStickyToClipboard() {
             const stickyContent = document.getElementById('stickyContent').textContent;
-            
+
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(stickyContent).then(() => {
                     showCopyNotification();
@@ -2731,14 +1704,14 @@
                 <head>
                     <title>Informe Dermatológico</title>
                     <style>
-                        body { 
-                            font-family: Arial, sans-serif; 
-                            margin: 20px; 
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 20px;
                             line-height: 1.6;
                         }
-                        pre { 
-                            white-space: pre-wrap; 
-                            font-family: 'Courier New', monospace; 
+                        pre {
+                            white-space: pre-wrap;
+                            font-family: 'Courier New', monospace;
                             font-size: 12px;
                         }
                         .header {
@@ -2778,12 +1751,12 @@
         function scrollToSection(sectionId) {
             const section = document.getElementById(`section-${sectionId}`); // Usa el ID de la sección principal
             if (section) {
-                section.scrollIntoView({ 
-                    behavior: 'smooth', 
+                section.scrollIntoView({
+                    behavior: 'smooth',
                     block: 'start',
                     inline: 'nearest'
                 });
-                
+
                 const header = section.querySelector('.section-header');
                 if (header && !header.classList.contains('expanded')) {
                     toggleSection(header);
@@ -2804,10 +1777,10 @@
         function toggleSection(headerElement) {
             const content = headerElement.nextElementSibling;
             const section = headerElement.parentElement;
-            
+
             headerElement.classList.toggle('expanded');
             section.classList.toggle('active');
-            
+
             if (content.classList.toggle('expanded')) {
                 content.style.maxHeight = content.scrollHeight + 'px';
                 content.classList.add('slide-in');
@@ -2829,24 +1802,24 @@
                 toggleSection(header);
             });
         }
-        
+
         // 🚫 Manejo de "Sin quejas" (Existente, pero modificado para llamar a updateDashboard)
         function handleNoComplaints() {
             const noComplaintsCheckbox = document.getElementById('sin-quejas');
             const otherCheckboxes = document.querySelectorAll('#anamnesis input[type="checkbox"]:not(#sin-quejas)');
-            
+
             otherCheckboxes.forEach(checkbox => {
                 checkbox.disabled = noComplaintsCheckbox.checked;
                 if (noComplaintsCheckbox.checked) checkbox.checked = false;
             });
             updateDashboard(); // Llamada a updateDashboard
         }
-        
+
         // Manejo de "Sin Alergias" (Nuevo para `derma.html`)
         function toggleSinAlergias() {
             const sinAlergiasCheckbox = document.getElementById('sin-alergias');
             const otherAllergyCheckboxes = document.querySelectorAll('#antecedentes .exam-section:first-of-type input[type="checkbox"]:not(#sin-alergias)');
-            
+
             otherAllergyCheckboxes.forEach(checkbox => {
                 checkbox.disabled = sinAlergiasCheckbox.checked;
                 if (sinAlergiasCheckbox.checked) {
@@ -2867,7 +1840,7 @@
         function toggleSinAntecedentesFam() {
             const sinAntecedentesFamCheckbox = document.getElementById('sin-antec-fam');
             const otherFamCheckboxes = document.querySelectorAll('#antecedentes .exam-section:nth-of-type(2) input[type="checkbox"]:not(#sin-antec-fam)');
-            
+
             otherFamCheckboxes.forEach(checkbox => {
                 checkbox.disabled = sinAntecedentesFamCheckbox.checked;
                 if (sinAntecedentesFamCheckbox.checked) checkbox.checked = false;
@@ -2889,7 +1862,7 @@
         function toggleSpecification(checkboxId, specFieldId) {
             const checkbox = document.getElementById(checkboxId);
             const specField = document.getElementById(specFieldId);
-            
+
             if (checkbox && specField) {
                 if (checkbox.checked) {
                     specField.classList.add('show');
@@ -2907,7 +1880,7 @@
             const tieneNevus = document.getElementById('tiene-nevus').checked;
             const lesionSospechosa = document.getElementById('lesion-sospechosa').checked;
             const abcdeSection = document.getElementById('abcde-evaluation');
-            
+
             if (tieneNevus || lesionSospechosa) {
                 abcdeSection.style.display = 'block';
             } else {
@@ -2930,7 +1903,7 @@
             const diameter = parseFloat(document.getElementById('abcde-diametro').value) || 0;
             const mayor6 = document.getElementById('diametro-mayor-6');
             const menor6 = document.getElementById('diametro-menor-6');
-            
+
             if (diameter > 6) {
                 mayor6.checked = true;
                 menor6.checked = false;
@@ -2947,7 +1920,7 @@
         // Función para evaluar la regla ABCDE completa (Existente, modificado para llamar a updateDashboard)
         function evaluateABCDE() {
             let score = 0;
-            
+
             // A - Asimetría
             if (document.getElementById('asimetria-si') && document.getElementById('asimetria-si').checked) {
                 score++;
@@ -2979,7 +1952,7 @@
 
             // Actualizar la interfaz
             document.getElementById('abcde-score').textContent = score + '/5';
-            
+
             let riskLevel, recommendation;
             if (score === 0) {
                 riskLevel = 'Muy bajo';
@@ -2997,21 +1970,21 @@
 
             document.getElementById('abcde-risk').textContent = riskLevel;
             document.getElementById('abcde-recommendation').textContent = recommendation;
-            
+
             updateDashboard(); // Llama a updateDashboard
         }
 
         // Función para manejar clics en el mapa corporal (Existente, modificado para llamar a updateDashboard)
         function initializeBodyMap() {
             const bodySvgs = document.querySelectorAll('.body-svg');
-            
+
             bodySvgs.forEach(svg => {
                 const bodyParts = svg.querySelectorAll('.body-part');
-                
+
                 bodyParts.forEach(part => {
                     part.addEventListener('click', function() {
                         const area = this.getAttribute('data-area');
-                        
+
                         if (selectedBodyAreas.has(area)) {
                             selectedBodyAreas.delete(area);
                             this.classList.remove('selected');
@@ -3019,7 +1992,7 @@
                             selectedBodyAreas.add(area);
                             this.classList.add('selected');
                         }
-                        
+
                         updateSelectedAreasDisplay();
                         updateDashboard(); // Llama a updateDashboard
                     });
@@ -3031,28 +2004,28 @@
         function updateSelectedAreasDisplay() {
             const frontDisplay = document.getElementById('selected-areas-front');
             const backDisplay = document.getElementById('selected-areas-back');
-            
+
             frontDisplay.innerHTML = '';
             backDisplay.innerHTML = '';
-            
+
             // Definir qué áreas pertenecen a la vista posterior (se pueden refinar si hay superposición)
             const posteriorAreas = [
                 'Occipital', 'Región auricular derecha', 'Región auricular izquierda', 'Nuca',
                 'Espalda alta derecha', 'Espalda alta izquierda', 'Espalda media derecha', 'Espalda media izquierda', 'Región lumbar',
                 'Hombro derecho posterior', 'Hombro izquierdo posterior', 'Brazo derecho posterior superior', 'Brazo izquierdo posterior superior',
                 'Codo derecho posterior', 'Codo izquierdo posterior', 'Antebrazo derecho posterior', 'Antebrazo izquierdo posterior',
-                'Mano derecha posterior', 'Mano izquierda posterior', 'Región sacra', 'Glúteo derecho', 'Glúteo izquierdo', 
+                'Mano derecha posterior', 'Mano izquierda posterior', 'Región sacra', 'Glúteo derecho', 'Glúteo izquierdo',
                 'Pliegue interglúteo', 'Muslo derecho posterior', 'Muslo izquierdo posterior', 'Hueco poplíteo derecho',
                 'Hueco poplíteo izquierdo', 'Pantorrilla derecha', 'Pantorrilla izquierda', 'Tendón Aquiles derecho',
                 'Tendón Aquiles izquierdo', 'Talón derecho', 'Talón izquierdo', 'Planta pie derecho', 'Planta pie izquierdo'
             ];
-            
+
             selectedBodyAreas.forEach(area => {
                 const tag = document.createElement('span');
                 tag.className = 'selected-area-tag';
                 tag.textContent = area;
                 tag.onclick = (event) => { event.stopPropagation(); removeBodyArea(area); }; // Detener propagación
-                
+
                 if (posteriorAreas.includes(area)) {
                     backDisplay.appendChild(tag);
                 } else {
@@ -3064,11 +2037,11 @@
         // Función para remover área del mapa corporal (Existente, modificado para llamar a updateDashboard)
         function removeBodyArea(area) {
             selectedBodyAreas.delete(area);
-            
+
             document.querySelectorAll(`[data-area="${area}"]`).forEach(part => {
                 part.classList.remove('selected');
             });
-            
+
             updateSelectedAreasDisplay();
             updateDashboard(); // Llama a updateDashboard
         }
@@ -3088,26 +2061,26 @@
             const A = extension;
             const B = eritema + edema + excoriacion + liquenificacion + descamacion + xerosis;
             const C = prurito + sueño;
-            
+
             const scoradTotal = (A/5 + 7*B/2 + C).toFixed(1);
             document.getElementById('scorad-total').textContent = scoradTotal;
-            
+
             updateDashboard(); // Llama a updateDashboard
         }
 
         // Función para calcular DLQI (Existente, modificado para llamar a updateDashboard)
         function calculateDLQI() {
             let total = 0;
-            
+
             for (let i = 1; i <= 10; i++) {
                 const selected = document.querySelector(`input[name="dlqi-${i}"]:checked`);
                 if (selected) {
                     total += parseInt(selected.value);
                 }
             }
-            
+
             document.getElementById('dlqi-total').textContent = total;
-            
+
             let interpretation;
             if (total <= 1) {
                 interpretation = 'Sin impacto en la calidad de vida';
@@ -3120,7 +2093,7 @@
             } else {
                 interpretation = 'Impacto extremadamente grande en la calidad de vida';
             }
-            
+
             document.getElementById('dlqi-interpretation').textContent = interpretation;
 
             // Actualizar estado de Calidad de Vida en el Dashboard
@@ -3148,15 +2121,15 @@
         // 📊 ACTUALIZAR DASHBOARD (Copiado y adaptado de gastro.html)
         function updateDashboard() {
             const sections = [
-                'antecedentes', 'anamnesis', 'lesiones-pigmentadas', 'primary-lesions', 
+                'antecedentes', 'anamnesis', 'lesiones-pigmentadas', 'primary-lesions',
                 'secondary-lesions', 'distribution', 'appendages', 'special-tests', 'severity'
             ];
-            
+
             let currentCompletedSections = 0;
             let currentAlertCount = 0;
             let currentWarningCount = 0;
             let currentFindingsCount = 0;
-            
+
             sections.forEach(sectionId => {
                 const sectionElement = document.getElementById(sectionId);
                 if (sectionElement) {
@@ -3165,7 +2138,7 @@
                     const numbers = sectionElement.querySelectorAll('input[type="number"]');
                     const textareas = sectionElement.querySelectorAll('textarea');
                     const texts = sectionElement.querySelectorAll('input[type="text"]'); // Para campos de especificación
-                    
+
                     let hasContent = false;
                     if (checkboxes.length > 0 || radios.length > 0) hasContent = true;
                     numbers.forEach(input => {
@@ -3181,14 +2154,14 @@
                     if (sectionId === 'distribution' && selectedBodyAreas.size > 0) {
                         hasContent = true;
                     }
-                    
+
                     if (hasContent) {
                         currentCompletedSections++;
                         currentFindingsCount += (checkboxes.length + radios.length + (numbers.length > 0 ? 1 : 0) + (textareas.length > 0 ? 1 : 0));
-                        
+
                         const badge = document.getElementById(`badge-${sectionId}`);
                         const navItem = document.getElementById(`nav-${sectionId}`);
-                        
+
                         if (badge) {
                             badge.classList.add('completed');
                             badge.innerHTML = '<i class="fas fa-check"></i>';
@@ -3197,11 +2170,11 @@
                             navItem.style.opacity = '1';
                             navItem.parentElement.classList.add('completed');
                         }
-                        
+
                         // Criterios de alerta y warning específicos para dermatología
                         // Alert: requiere acción inmediata/urgente (melanoma alto riesgo, pénfigo, etc.)
                         // Warning: requiere atención, seguimiento (dermatitis moderada/severa, úlceras, etc.)
-                        
+
                         // ABCDE Score
                         const abcdeRisk = document.getElementById('abcde-risk').textContent;
                         if (abcdeRisk === 'Alto') currentAlertCount++;
@@ -3238,7 +2211,7 @@
                     } else {
                         const badge = document.getElementById(`badge-${sectionId}`);
                         const navItem = document.getElementById(`nav-${sectionId}`);
-                        
+
                         if (badge) {
                             badge.classList.remove('completed');
                             badge.innerHTML = '<i class="fas fa-circle"></i>';
@@ -3250,7 +2223,7 @@
                     }
                 }
             });
-            
+
             const totalSections = sections.length;
             const progress = Math.round((currentCompletedSections / totalSections) * 100);
             document.getElementById('exam-progress').textContent = `${progress}%`;
@@ -3258,18 +2231,18 @@
             document.getElementById('alert-count').textContent = currentAlertCount;
             document.getElementById('warning-count').textContent = currentWarningCount;
             document.getElementById('findings-count').textContent = currentFindingsCount;
-            
+
             const alertsItem = document.getElementById('alerts-item');
             const warningsItem = document.getElementById('warnings-item');
             const findingsItem = document.getElementById('findings-item');
             const qualityOfLifeItem = document.getElementById('quality-of-life-item'); // Asegurarse de que esté aquí
 
             // Si quieres que siempre se muestren, no necesitas el display='flex' condicional
-            alertsItem.style.display = 'flex'; 
+            alertsItem.style.display = 'flex';
             warningsItem.style.display = 'flex';
             findingsItem.style.display = 'flex';
             qualityOfLifeItem.style.display = 'flex';
-            
+
             alertsItem.classList.toggle('dashboard-alert', currentAlertCount > 0);
             warningsItem.classList.toggle('dashboard-warning', currentWarningCount > 0);
             findingsItem.classList.toggle('dashboard-normal', currentFindingsCount > 0);
@@ -3333,7 +2306,7 @@
 
             if (alergiaAlimentosChecked) alergiasReport.push(`alimentos (${alergiaAlimentosSpec || 'no especificado'})`);
             else if (alergiaAlimentosSpec) alergiasReport.push(`alimentos no marcados (${alergiaAlimentosSpec})`);
-            
+
             if (alergiaContactoChecked) alergiasReport.push(`alérgenos de contacto (${alergiaContactoSpec || 'no especificado'})`);
             else if (alergiaContactoSpec) alergiasReport.push(`alérgenos de contacto no marcados (${alergiaContactoSpec})`);
 
@@ -3400,7 +2373,7 @@
             // Tratamientos Previos y Actuales
             const tratamientosPrevios = getInputValue('tratamientos-previos');
             const medicacionHabitual = getInputValue('medicacion-habitual');
-            
+
             if (tratamientosPrevios && tratamientosPrevios.trim()) {
                 antecedentesAdded = true;
                 antecedentesText += `Tratamientos previos para la condición actual: ${tratamientosPrevios.trim()}. `;
@@ -3416,7 +2389,7 @@
                  antecedentesAdded = true;
                  antecedentesText += `Medicación habitual: No refiere. `;
             }
-            
+
             if (antecedentesAdded) {
                 conclusion += `ANTECEDENTES:\n${antecedentesText.trim()}\n\n`;
             }
@@ -3425,7 +2398,7 @@
             let quejasPrincipalesAdded = false;
             let quejasPrincipalesText = '';
             const quejasReport = [];
-            const sinQuejasMarcado = isChecked('sin-quejas'); 
+            const sinQuejasMarcado = isChecked('sin-quejas');
 
             if (sinQuejasMarcado) {
                 quejasReport.push('el paciente no refiere quejas');
@@ -3443,7 +2416,7 @@
                     quejasPrincipalesText += `Motivo de consulta: Consulta de rutina dermatológica, ${formatList(quejasReport)}. `;
                 } else {
                     quejasPrincipalesText += `Motivo de consulta: Paciente consulta por ${formatList(quejasReport)}. `;
-                    
+
                     // Características Temporales
                     const tiempoEvolucion = getRadioButtonValue('tiempo-evolucion');
                     if (tiempoEvolucion) {
@@ -3488,7 +2461,7 @@
                     if (isChecked('cambios-hormonales')) factoresDesencadenantesReport.push(getLabelText('cambios-hormonales'));
                     if (isChecked('picaduras')) factoresDesencadenantesReport.push(getLabelText('picaduras'));
                     if (isChecked('contacto-animales')) factoresDesencadenantesReport.push(getLabelText('contacto-animales'));
-                    
+
                     if (factoresDesencadenantesReport.length > 0) {
                         quejasPrincipalesText += `Factores desencadenantes posibles: ${formatList(factoresDesencadenantesReport)}. `;
                     } else if (document.querySelectorAll('#anamnesis .exam-container:nth-of-type(3) input').length > 0) {
@@ -3507,7 +2480,7 @@
             const tieneNevus = isChecked('tiene-nevus');
             const lesionSospechosa = isChecked('lesion-sospechosa');
             const abcdeSectionVisible = document.getElementById('abcde-evaluation').style.display !== 'none';
-            
+
             if (tieneNevus || lesionSospechosa || abcdeSectionVisible) {
                 abcdeAdded = true;
                 abcdeText += `Evaluación de lesiones pigmentadas: `;
@@ -3524,10 +2497,10 @@
 
                 const abcdeScore = document.getElementById('abcde-score')?.textContent;
                 const abcdeRisk = document.getElementById('abcde-risk')?.textContent;
-                
+
                 if (abcdeScore && abcdeScore !== '--') { // No se usa 0/5 porque puede no haber inputs
                     abcdeText += `Aplicando la regla ABCDE: `;
-                    
+
                     const criteriosReport = [];
                     const asimetria = getRadioButtonValue('abcde-asimetria');
                     if(asimetria) criteriosReport.push(`Asimetría: ${asimetria}`);
@@ -3544,7 +2517,7 @@
                     } else if (coloresMarcados.length === 1 && !colorUniformeChecked) { // Un solo color pero no uniforme, no debería pasar si no hay radio
                          criteriosReport.push(`Color: No uniforme (${formatList(coloresMarcados)})`);
                     }
-                    
+
                     const diametro = getInputValue('abcde-diametro');
                     const diametroEval = getRadioButtonValue('abcde-diametro-eval');
                     if(diametroEval) criteriosReport.push(`Diámetro: ${diametroEval}${diametro ? ` (${diametro}mm)` : ''}`);
@@ -3558,7 +2531,7 @@
                     } else if (sinCambiosChecked) {
                         criteriosReport.push(`Evolución: Sin cambios`);
                     }
-                    
+
                     if (criteriosReport.length > 0) {
                         abcdeText += `Hallazgos de ABCDE: ${criteriosReport.join('; ')}. `;
                     } else if (abcdeSectionVisible) { // Sección visible, pero no hay nada marcado
@@ -3988,7 +2961,7 @@
                 let result = '';
                 if (posChecked) result = 'Positivo';
                 else if (negChecked) result = 'Negativo';
-                
+
                 if (result || note) { // Si hay un resultado o una nota, la incluimos
                     specialTestsAdded = true;
                     kohPruebasReport.push(`${capitalizeFirstLetter(idPrefix.replace('koh-', 'KOH de ')).replace('Unas', 'Uñas').replace('Escamas', 'Escamas cutáneas')}: ${result || 'Sin resultado'}${note ? ` (${note})` : ''}`);
@@ -4182,7 +3155,7 @@
 
                 conclusion += `Un total de ${findingsCount} hallazgos relevantes han sido registrados en este examen. `;
                 conclusion += `La evaluación de calidad de vida indica un ${qualityOfLifeStatus.toLowerCase()}.`;
-                
+
                 conclusion += '\n\n';
 
                 conclusion += 'IMPRESIÓN DIAGNÓSTICA:\n';
@@ -4200,7 +3173,7 @@
         // Función para copiar al portapapeles (original del derma.html, pero con nueva lógica de notificación)
         function copyConclusion() {
             const conclusion = document.getElementById('conclusion-text').textContent;
-            
+
             if (navigator.clipboard && window.isSecureContext) {
                 // Usar la API moderna del portapapeles
                 navigator.clipboard.writeText(conclusion).then(() => {
@@ -4226,7 +3199,7 @@
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
-            
+
             try {
                 const successful = document.execCommand('copy');
                 if (successful) {
@@ -4238,7 +3211,7 @@
                 console.error('Fallback: Error al copiar: ', err);
                 alert('Error al copiar el texto. Por favor, seleccione el texto manualmente.');
             }
-            
+
             document.body.removeChild(textArea);
         }
 
@@ -4257,7 +3230,7 @@
                 document.querySelectorAll('input[type="text"]').forEach(tb => tb.value = '');
                 document.querySelectorAll('input[type="range"]').forEach(rb => rb.value = 0);
                 document.querySelectorAll('textarea').forEach(ta => ta.value = '');
-                
+
                 // Resetear valores específicos
                 document.getElementById('prurito-value').textContent = '0';
                 document.getElementById('pasi-total').textContent = '0';
@@ -4267,23 +3240,23 @@
                 document.getElementById('abcde-score').textContent = '0/5';
                 document.getElementById('abcde-risk').textContent = 'Bajo';
                 document.getElementById('abcde-recommendation').textContent = 'Seguimiento de rutina';
-                
+
                 // Limpiar mapa corporal
                 selectedBodyAreas.clear();
                 document.querySelectorAll('.body-part.selected').forEach(part => {
                     part.classList.remove('selected');
                 });
                 updateSelectedAreasDisplay();
-                
+
                 // Ocultar campos de especificación
                 document.querySelectorAll('.specification-field').forEach(field => {
                     field.classList.remove('show');
                     field.value = ''; // Asegurarse de que se borra el texto
                 });
-                
+
                 // Ocultar sección ABCDE
                 document.getElementById('abcde-evaluation').style.display = 'none';
-                
+
                 // Habilitar checkboxes de "sin quejas" y "sin alergias" si estaban deshabilitados
                 document.getElementById('sin-quejas').disabled = false;
                 document.getElementById('sin-alergias').disabled = false;
@@ -4307,7 +3280,7 @@
                 document.getElementById('warning-count').textContent = '0';
                 document.getElementById('findings-count').textContent = '0';
                 document.getElementById('quality-of-life-status').textContent = 'Pendiente';
-                
+
                 document.getElementById('alerts-item').classList.remove('dashboard-alert');
                 document.getElementById('warnings-item').classList.remove('dashboard-warning');
                 document.getElementById('findings-item').classList.remove('dashboard-normal');
@@ -4320,11 +3293,11 @@
                 calculatePASI();
                 calculateSCORAD();
                 calculateDLQI();
-                
+
                 updateDashboard(); // Forzar actualización del dashboard y conclusión
             }
         }
-        
+
         document.addEventListener('DOMContentLoaded', () => {
             // Cargar tema guardado
             const savedTheme = localStorage.getItem('theme');
@@ -4335,18 +3308,18 @@
 
             // Inicializar mapa corporal
             initializeBodyMap();
-            
+
             // Event listeners para actualizar dashboard y conclusión
             document.querySelectorAll('input, select, textarea').forEach(el => {
                 el.addEventListener('change', updateDashboard);
                 el.addEventListener('input', updateDashboard);
             });
-             
+
             // Event listeners específicos para ABCDE
             document.querySelectorAll('[name^="abcde-"], [id^="color-"], [id^="evol-"]').forEach(input => {
                 input.addEventListener('change', evaluateABCDE);
             });
-             
+
             // Ajustar altura de secciones al cambiar contenido
             document.querySelector('.main-container').addEventListener('change', (event) => {
                 const sectionContent = event.target.closest('.section-content.expanded');
@@ -4357,13 +3330,13 @@
 
             // Expandir la primera sección por defecto
             toggleSection(document.querySelector('.section-header'));
-            
+
             // Inicializar todas las evaluaciones y cálculos al cargar la página
             evaluateABCDE();
             calculatePASI();
             calculateSCORAD();
             calculateDLQI();
-            
+
             // Forzar una actualización inicial completa del dashboard y la conclusión
             updateDashboard();
 
