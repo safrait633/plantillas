@@ -1,0 +1,1025 @@
+/* Специфичные стили для дерматологического экзамена */
+.main-container {
+    padding-top: 160px; /* Пространство для фиксированного дашборда */
+}
+
+.nav-item i {
+    width: 16px;
+    text-align: center;
+}
+
+/* 📊 PANEL LATERAL STICKY - FUNCIONALIDAD PRINCIPAL (Copiado и adaptado de gastro.html) */
+.sticky-panel {
+    position: fixed;
+    top: 160px; /* Ajustado para debajo del dashboard */
+    right: -420px; /* Oculto por defecto */
+    width: 400px;
+    height: calc(100vh - 180px);
+    background: var(--card-bg);
+    border-radius: 12px 0 0 12px;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+    z-index: 997;
+    transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
+    border: 2px solid var(--primary-gradient);
+}
+
+.sticky-panel.active {
+    right: 0;
+}
+
+.sticky-header {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.sticky-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.sticky-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    border-radius: 4px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.sticky-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.05);
+}
+
+.sticky-content {
+    padding: 20px;
+    height: calc(100% - 70px);
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    background: var(--light-bg);
+}
+
+.update-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--primary-gradient);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    z-index: 10;
+}
+
+.update-indicator.active {
+    display: flex;
+}
+
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Notificación de copia (Copiado de gastro.html) */
+.copy-notification {
+    position: fixed;
+    top: 200px;
+    right: 20px;
+    background: var(--normal-color);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateX(100px);
+    transition: all 0.3s ease;
+    z-index: 1002;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.copy-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Ajustar contenido principal cuando panel está activo (Copiado и adaptado de gastro.html) */
+/* Aplicado al body para simplicidad, como en gastro.html */
+body.split-view-active .main-container {
+    margin-right: 420px;
+    transition: margin-right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+body.split-view .main-container { /* Para el panel de navegación izquierdo */
+    margin-left: 290px;
+    margin-right: 20px; /* Asegura que no se solape con el sticky si ambos están abiertos */
+    transition: margin-left 0.3s ease, margin-right 0.3s ease;
+}
+
+/* Contenedor principal (Modificado para usar variables и mejores sombras) */
+.main-container {
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 30px;
+    margin: 0 20px; /* Ajuste para espacio en los lados */
+    transition: all 0.3s ease;
+}
+
+/* Título principal (Modificado para usar gradiente de texto) */
+h1 {
+    color: var(--text-color-light); /* Fallback */
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 28px;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding-bottom: 15px; /* Reemplaza border-bottom con gradiente de texto */
+}
+
+/* Стили секций уже определены в common.css */
+
+.section-header .arrow {
+    transition: transform 0.3s ease;
+    font-size: 18px;
+}
+
+.section-header.expanded .arrow {
+    transform: rotate(180deg);
+}
+
+/* Badge de completado (Copiado de gastro.html) */
+.section-header .completion-badge {
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+.section-header .completion-badge.completed {
+    background: var(--normal-color);
+}
+
+.section-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out;
+    background: var(--light-bg); /* Fondo de la sección de contenido */
+}
+
+.section-content.expanded {
+    padding: 20px;
+}
+
+/* Contenedores de examen (Modificado para usar variables и sombras en hover) */
+.exam-container {
+    background: var(--card-bg);
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease; /* Transición para hover */
+}
+.exam-container:hover {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* Sombra suave al pasar el ratón */
+}
+
+.exam-header {
+    font-size: 18px;
+    font-weight: 600;
+    background: var(--primary-gradient); /* Usar gradiente para el encabezado del examen */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: -20px -20px 15px -20px; /* Extender el fondo */
+    padding: 12px 20px;
+    border-radius: 8px 8px 0 0; /* Bordes redondeados en la parte superior */
+    border-bottom: none; /* Eliminar el borde inferior que tenías */
+}
+
+.exam-section {
+    background: var(--light-bg);
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.exam-section h4 {
+    color: var(--text-color-light); /* Color de texto principal */
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.sub-header {
+    color: var(--primary-gradient); /* Usar tu color primario para sub-headers */
+    margin: 15px 0 8px 0;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Checkbox grid (Mejorado de gastro.html) */
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px; /* Más padding */
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+.checkbox-item:hover {
+    background: rgba(230, 126, 34, 0.05); /* Color de hover sutil */
+}
+
+.checkbox-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--normal-color); /* Color del checkbox al marcar */
+}
+.checkbox-item input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--normal-color); /* Color del radio al marcar */
+}
+
+.checkbox-item label {
+    font-size: 13px;
+    color: var(--text-color-light);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+.checkbox-item input:checked + label {
+    color: var(--normal-color);
+    font-weight: 500;
+}
+
+.measurement {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 5px 0;
+}
+
+.measurement label {
+    font-size: 12px;
+    color: #5d6d7e;
+    flex-basis: 120px;
+    flex-shrink: 0;
+}
+
+.input-field {
+    width: 80px;
+    padding: 6px 10px; /* Más padding */
+    border: 2px solid #e9ecef; /* Borde más grueso и claro */
+    border-radius: 6px; /* Más redondeado */
+    font-size: 12px;
+    text-align: center;
+    transition: all 0.3s ease; /* Transición para el foco */
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--primary-gradient); /* Color de borde al enfocar */
+    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1); /* Sombra suave al enfocar */
+}
+
+.body-map { /* Se mantiene pero la usaremos con interactive-body-map */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.body-area { /* Se mantiene */
+    padding: 10px;
+    border: 1px solid #e1e8ed;
+    border-radius: 4px;
+    background: var(--card-bg);
+}
+
+.body-area h5 { /* Se mantiene */
+    margin: 0 0 8px 0;
+    font-size: 12px;
+    color: var(--text-color-light);
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Secciones de evaluación de severidad (adaptadas para usar variables и transparencia) */
+.severity-section {
+    background: rgba(255, 193, 7, 0.08); /* Fondo suave del color de advertencia */
+    border: 1px solid var(--warning-color);
+    border-radius: 8px; /* Más redondeado */
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.severity-section h4 {
+    color: var(--warning-color);
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.severity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+}
+
+.severity-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px;
+}
+
+.severity-item input[type="radio"] {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--normal-color); /* Color del radio al marcar */
+}
+
+.severity-item label {
+    font-size: 12px;
+    color: var(--text-color-light); /* Color de texto principal */
+    cursor: pointer;
+}
+
+.test-results {
+    margin-top: 10px;
+}
+
+.test-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 8px 12px; /* Más padding */
+    margin: 4px 0;
+    background: var(--card-bg);
+    border: 1px solid #e8ecef;
+    border-radius: 6px; /* Más redondeado */
+    transition: all 0.3s ease; /* Transición para hover */
+}
+.test-item:hover {
+    border-color: var(--primary-gradient); /* Borde con gradiente al pasar el ratón */
+    box-shadow: 0 2px 8px rgba(230, 126, 34, 0.1); /* Sombra suave al pasar el ratón */
+}
+
+.test-item label {
+    font-size: 12px;
+    color: var(--text-color-light);
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.test-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.test-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.test-checkbox input[type="checkbox"] {
+    width: 16px; /* Más grande */
+    height: 16px; /* Más grande */
+    accent-color: var(--normal-color);
+}
+
+.test-checkbox span {
+    font-size: 12px; /* Más grande */
+    font-weight: 600; /* Más negrita */
+}
+
+.positive { color: var(--alert-color) !important; }
+.negative { color: var(--normal-color) !important; }
+
+.bilateral-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.side-container {
+    padding: 15px;
+    background: var(--card-bg);
+    border: 1px solid #e8ecef;
+    border-radius: 8px; /* Más redondeado */
+    transition: all 0.3s ease; /* Transición para hover */
+}
+.side-container:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.side-header {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-color-light);
+    margin-bottom: 12px;
+    text-align: center;
+    border-bottom: 2px solid var(--primary-gradient); /* Borde con gradiente */
+    padding-bottom: 8px;
+}
+
+.morphology-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.morphology-section {
+    padding: 15px;
+    background: var(--card-bg);
+    border: 1px solid #e8ecef;
+    border-radius: 8px; /* Más redondeado */
+    transition: all 0.3s ease;
+}
+.morphology-section:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.morphology-section h5 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: var(--primary-gradient); /* Usar gradiente para el título */
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Conclusión (Mejorado de gastro.html) */
+.conclusion {
+    margin-top: 30px;
+    padding: 25px; /* Más padding */
+    background: var(--card-bg);
+    border-radius: 12px; /* Más redondeado */
+    border: 2px solid #dee2e6;
+    position: relative;
+    overflow: hidden;
+}
+
+.conclusion::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--primary-gradient);
+}
+
+.conclusion h3 {
+    color: var(--text-color-light);
+    margin-bottom: 15px;
+}
+
+.conclusion-text {
+    padding: 20px; /* Más padding */
+    background: var(--light-bg);
+    border-radius: 8px; /* Más redondeado */
+    border: 1px solid #dee2e6;
+    min-height: 200px;
+    font-family: 'Courier New', monospace;
+    white-space: pre-wrap;
+    font-size: 13px;
+    line-height: 1.5; /* Más espacio entre líneas */
+}
+
+/* Botones de control (Mejorado de gastro.html) */
+.control-buttons {
+    margin-top: 25px;
+    display: flex;
+    gap: 12px; /* Más espacio */
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 24px; /* Más padding */
+    border: none;
+    border-radius: 8px; /* Más redondeado */
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease; /* Transición general */
+    display: flex; /* Para íconos */
+    align-items: center;
+    gap: 8px;
+}
+
+.btn:hover {
+    transform: translateY(-2px); /* Efecto de elevación */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Colores de botones usando gradientes и variables */
+.btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 4px 15px rgba(230, 126, 34, 0.4); /* Sombra más fuerte para primario */
+}
+
+.btn-secondary {
+    background-color: var(--info-color); /* Usar color info */
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #138496; /* Color más oscuro al pasar el ratón */
+    box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3); /* Sombra para secundario */
+}
+
+/* TOGGLE DE TEMA (Copiado de gastro.html) */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1001;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Sombra */
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+}
+
+/* BOTÓN HOME (Copiado de gastro.html) */
+/* Eliminado el original и se usará el copiado arriba */
+.home-button { /* Se mantiene el estilo de gastro.html */
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--normal-color); /* Color verde para home */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1001;
+    transition: all 0.3s ease;
+}
+
+.home-button:hover {
+    background-color: #229954;
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+
+/* Leyendas (Modificado para usar variables) */
+.legend {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+    font-size: 12px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+.primary-color { background-color: var(--info-color); } /* Usar info-color para primaria */
+.secondary-color { background-color: var(--warning-color); } /* Usar warning-color para secundaria */
+.severity-color { background-color: var(--alert-color); } /* Usar alert-color para severidad */
+
+.distribution-map {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.anatomy-region {
+    border: 1px solid #ddd;
+    border-radius: 8px; /* Más redondeado */
+    padding: 12px; /* Más padding */
+    background: var(--card-bg);
+    transition: all 0.3s ease;
+}
+.anatomy-region:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.anatomy-region h6 {
+    margin: 0 0 8px 0;
+    font-size: 13px; /* Más grande */
+    font-weight: 600;
+    color: var(--primary-gradient); /* Usar gradiente para el título */
+    text-align: center;
+    border-bottom: 1px solid var(--primary-gradient);
+    padding-bottom: 5px;
+}
+
+.description-area {
+    width: 100%;
+    min-height: 60px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+    resize: vertical;
+    background: var(--light-bg); /* Fondo acorde al tema */
+    color: var(--text-color-light);
+    transition: all 0.3s ease;
+}
+.description-area:focus {
+    outline: none;
+    border-color: var(--primary-gradient);
+    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+}
+
+.score-calculation {
+    background: rgba(39, 174, 96, 0.08); /* Fondo suave del normal-color */
+    border: 1px solid var(--normal-color);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.score-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px 0;
+    font-size: 13px;
+}
+
+.score-value {
+    font-weight: 600;
+    color: var(--normal-color);
+}
+
+/* ===== NUEVAS FUNCIONALIDADES AÑADIDAS ===== */
+
+/* Campo de texto expandible para especificaciones */
+.specification-field {
+    width: 100%;
+    margin-top: 8px;
+    padding: 6px 10px;
+    border: 1px solid #d1d9e0;
+    border-radius: 4px;
+    font-size: 12px;
+    background: var(--light-bg);
+    color: var(--text-color-light);
+    transition: all 0.3s ease;
+    display: none;
+}
+
+.specification-field.show {
+    display: block;
+}
+
+.specification-field:focus {
+    outline: none;
+    border-color: var(--primary-gradient);
+    background: var(--card-bg);
+    box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.1);
+}
+
+/* Mapa corporal interactivo (Mejorado de tu original) */
+.interactive-body-map {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 20px 0;
+    background: var(--card-bg);
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.body-diagram {
+    position: relative;
+    background: var(--light-bg);
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+
+.body-diagram h6 {
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-color-light);
+}
+
+.body-svg {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    cursor: crosshair;
+}
+
+.selected-areas {
+    margin-top: 15px;
+    font-size: 12px;
+    color: var(--text-color-light);
+}
+
+.selected-area-tag {
+    display: inline-block;
+    background: var(--primary-gradient);
+    color: white;
+    padding: 4px 8px;
+    margin: 2px;
+    border-radius: 12px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.selected-area-tag:hover {
+    background: #d35400; /* Color más oscuro */
+    transform: translateY(-1px);
+}
+
+/* Regla ABCDE para melanoma (Mejorada con variables) */
+.abcde-section {
+    background: rgba(255, 152, 0, 0.08); /* Fondo suave del color de advertencia */
+    border: 2px solid var(--warning-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 15px 0;
+}
+
+.abcde-section h4 {
+    color: var(--warning-color);
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 2px solid var(--warning-color); /* Borde con color de advertencia */
+    padding-bottom: 8px;
+}
+
+.abcde-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.abcde-item {
+    background: var(--card-bg);
+    border: 1px solid #ffcc02; /* Color de borde de advertencia */
+    border-radius: 6px;
+    padding: 12px;
+    transition: all 0.3s ease;
+}
+.abcde-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transform: translateY(-2px);
+}
+
+.abcde-letter {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--warning-color);
+    margin-bottom: 8px;
+}
+
+.abcde-description {
+    font-size: 12px;
+    color: var(--text-color-light);
+    margin-bottom: 10px;
+}
+
+/* Vista dividida para conclusión (Se elimina el original para usar el sticky-panel) */
+/* La vista dividida ahora se maneja con las clases en el body: split-view и split-view-active */
+
+/* Escalas adicionales (Mejoradas con variables) */
+.scale-section {
+    background: rgba(70, 130, 180, 0.08); /* Fondo suave del info-color */
+    border: 1px solid var(--info-color);
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.scale-section h4 {
+    color: var(--info-color);
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.dlqi-question {
+    background: var(--card-bg);
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+    padding: 10px;
+    margin: 8px 0;
+}
+
+.dlqi-question label {
+    font-size: 12px;
+    color: var(--text-color-light);
+    margin-bottom: 6px;
+    display: block;
+}
+
+.dlqi-options {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.dlqi-option {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dlqi-option input[type="radio"] {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--normal-color);
+}
+
+.dlqi-option label {
+    font-size: 11px !important;
+    margin: 0 !important;
+    cursor: pointer;
+    color: var(--text-color-light);
+}
+
+/* Responsive design mejorado (Copiado de gastro.html) */
+@media (max-width: 1200px) {
+    /* Las reglas de split-view-container se eliminan porque se usan las del body */
+    .sticky-panel {
+        width: 350px;
+    }
+    body.split-view-active .main-container {
+        margin-right: 370px;
+    }
+}
+
+@media (max-width: 768px) {
+    body { padding-top: 120px; } /* Ajuste para móviles */
+
+    .control-bar {
+        position: relative;
+        top: auto;
+        right: auto;
+        justify-content: center;
+        margin: 10px 0;
+    }
+
+    .nav-panel {
+        transform: translateX(-100%);
+        width: calc(100vw - 40px);
+    }
+
+    .main-container {
+        margin: 0 10px;
+    }
+
+    body.split-view .main-container {
+        margin-left: 10px;
+    }
+
+    .sticky-panel {
+        width: calc(100vw - 20px);
+        right: -100vw;
+        left: 10px;
+        border-radius: 12px;
+    }
+
+    .sticky-panel.active {
+        right: auto;
+        left: 10px;
+    }
+
+    body.split-view-active .main-container {
+        margin-right: 10px;
+    }
+
+    .checkbox-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .interactive-body-map {
+        grid-template-columns: 1fr;
+    }
+
+    .abcde-grid {
+        grid-template-columns: 1fr;
+    }
+    .morphology-grid {
+        grid-template-columns: 1fr;
+    }
+    .bilateral-container {
+        grid-template-columns: 1fr;
+    }
+    .distribution-map {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Indicadores de campos completados (Copiado de gastro.html, renombrado и reestilizado) */
+.completion-badge { /* Nombre usado en gastro.html */
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+.completion-badge.completed { /* Cambiado a .completed para mantener consistencia con gastro.html */
+    background: var(--normal-color);
+}
+
+/* Nuevas animaciones (Copiado de gastro.html) */
+@keyframes slideIn {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease forwards;
+}

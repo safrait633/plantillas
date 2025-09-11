@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALGORITMO_NOMBRE_ESPECIALIDAD - MedScap</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        /* Estilos específicos de la especialidad */
+        :root {
+            --specialty-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --specialty-secondary: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e1b4b 0%, #1e293b 50%, #1e3a8a 100%);
+            min-height: 100vh;
+            color: white;
+            padding-top: 120px;
+        }
+
+        .dashboard-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--specialty-primary);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            padding: 15px 0;
+        }
+
+        .dashboard-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+            color: white;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .dashboard-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .dashboard-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .dashboard-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+
+        .section {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(16px);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: var(--specialty-primary);
+            color: white;
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .section-header:hover {
+            background: var(--specialty-secondary);
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .section-content {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .section-content.expanded {
+            padding: 25px;
+            max-height: 2000px; /* Ajustar según sea necesario */
+        }
+
+        .form-group {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .checkbox-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 12px;
+            accent-color: var(--specialty-primary);
+        }
+
+        .checkbox-item label {
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .sticky-panel {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(16px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            height: fit-content;
+            position: sticky;
+            top: 140px;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .back-button:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Botón de volver -->
+    <a href="index.html" class="back-button">
+        <i class="fas fa-arrow-left mr-2"></i>
+        Volver al Portal
+    </a>
+
+    <!-- Dashboard Fijo Superior -->
+    <div class="dashboard-fixed">
+        <div class="dashboard-content">
+            <div class="dashboard-grid">
+                <!-- Dashboard items se agregarán dinámicamente o por especialidad -->
+                <div class="dashboard-item">
+                    <i class="fas fa-notes-medical"></i>
+                    <div>Examen</div>
+                </div>
+            </div>
+            <div class="dashboard-controls">
+                <button onclick="toggleTheme()" class="dashboard-btn">
+                    <i id="theme-icon" class="fas fa-moon"></i>
+                </button>
+                <button onclick="printReport()" class="dashboard-btn">
+                    <i class="fas fa-print"></i>
+                </button>
+                <button onclick="exportPDF()" class="dashboard-btn">
+                    <i class="fas fa-file-pdf"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal -->
+    <div class="main-container">
+        <!-- Contenido Principal -->
+        <div class="main-content">
+            <!-- Las secciones se agregarán aquí -->
+            <div class="section" id="section-template">
+                <div class="section-header" onclick="toggleSection('template-content')">
+                    <div class="section-title">
+                        <i class="fas fa-file-alt"></i>
+                        <span>SECCIÓN DE EJEMPLO</span>
+                    </div>
+                    <div class="section-indicators">
+                        <span class="section-counter" id="template-counter">0/X</span>
+                        <i class="fas fa-chevron-down section-arrow"></i>
+                    </div>
+                </div>
+                <div class="section-content" id="template-content">
+                    <p>El contenido de la sección va aquí.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Lateral -->
+        <div class="sticky-panel" id="conclusion-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="color: white; margin: 0;">📋 Conclusión Clínica</h3>
+                <button onclick="copyConclusion()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+            <div id="conclusion-content" style="color: white; line-height: 1.6;">
+                <p>Seleccione las opciones para generar la conclusión automática.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+    <script>
+        // === FUNCIONES DE INTERFAZ ===
+        function toggleSection(sectionId) {
+            const content = document.getElementById(sectionId);
+            const header = content.previousElementSibling;
+            const arrow = header.querySelector('.section-arrow');
+
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                arrow.style.transform = 'rotate(0deg)';
+            } else {
+                // Opcional: cerrar otras secciones
+                // document.querySelectorAll('.section-content.expanded').forEach(sec => {
+                //     sec.classList.remove('expanded');
+                //     sec.previousElementSibling.querySelector('.section-arrow').style.transform = 'rotate(0deg)';
+                // });
+                content.classList.add('expanded');
+                arrow.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        function copyConclusion() {
+            const content = document.getElementById('conclusion-content').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                alert('Conclusión copiada al portapapeles');
+            });
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        function exportPDF() {
+            alert('Función de exportación PDF en desarrollo');
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            // Aquí puedes guardar la preferencia del tema en localStorage
+        }
+
+        // === LÓGICA DE LA ESPECIALIDAD VA AQUÍ ===
+        // ...
+
+        // === INICIALIZACIÓN ===
+        document.addEventListener('DOMContentLoaded', function() {
+            // Expandir primera sección por defecto
+            const firstSection = document.querySelector('.section-content');
+            if (firstSection) {
+                toggleSection(firstSection.id);
+            }
+
+            console.log('🩺 Módulo de Examen cargado exitosamente');
+        });
+    </script>
+</body>
+</html>
